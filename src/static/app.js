@@ -422,7 +422,7 @@ async function downloadAll() {
 function restoreKit() {
   let data = null;
   try { data = JSON.parse(localStorage.getItem(SAVE) || "null"); } catch (_) {}
-  if (!data || !data.kit || Date.now() - (data.t || 0) > 7 * 864e5) return;
+  if (!data || !data.kit || !Array.isArray(data.kit.options) || Date.now() - (data.t || 0) > 7 * 864e5) return;
   openData(data);
   $("restored").hidden = false;
 }
