@@ -836,6 +836,16 @@ async def page_main():
     page = (FOLDER / "static" / "index.html").read_text(encoding="utf-8")
     if "og:image" not in page:
         page = page.replace("<meta name=\"theme-color\"", META_SOCIAL + "<meta name=\"theme-color\"", 1)
+    if GATING_ACTIVE:
+        # put the contract address in the HTML itself, so crawlers and link checkers see it without running JS
+        ca = ORYNX_TOKEN
+        page = page.replace('<code id="caHome"></code>', f'<code id="caHome">{ca}</code>', 1)
+        page = page.replace('id="caBuy" href="https://ponsfamily.com/launchpad"', f'id="caBuy" href="https://ponsfamily.com/launchpad/{ca}"', 1)
+        page = page.replace('id="caScan" href="https://robin.etherscan.io"', f'id="caScan" href="https://robin.etherscan.io/token/{ca}"', 1)
+        page = page.replace("<b>Launching soon</b>", "<b>$ORYNX is live on pons</b>", 1)
+        page = page.replace('<p>The official contract address will be announced on <a href="https://x.com/orynxhq" target="_blank" rel="noopener">@orynxhq</a> on X.</p>',
+                            f'<p>Contract address on Robinhood Chain: <code>{ca}</code></p>', 1)
+        page = page.replace("</head>", f'<meta name="token:contract" content="{ca}">\n<meta name="token:chain" content="Robinhood Chain">\n</head>', 1)
     return page.replace("{{NAME_BOT}}", NAME_BOT)
 
 
