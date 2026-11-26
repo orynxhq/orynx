@@ -23,14 +23,15 @@ Describe an AI project or a meme coin in one sentence. Si Dev, the resident AI d
 | Launch kit builder (text + logos) | `src/app.py` |
 | Ask Si Dev (pre-launch advice chat) | `src/app.py` |
 | Community gallery, likes, kit pages `/k/<id>` | `src/app.py` |
-| Burn tracker, holders feed, bonding progress, referral board, kit of the day, embed badge | `src/fitur_lama.py` |
-| Mini token websites `/s/<slug>` | `src/fitur_lama.py`, `src/static/site.html` |
-| Launch pages on `/k/<id>`: CA, buy on pons, explorer, socials, on-chain ticker check | `src/launch_v1.py` |
-| Launch page showcase on the homepage | `src/pamer_v1.py` |
-| Bring your own logo for launch pages | `src/logo_v1.py` |
-| Own logo also on mini websites | `src/situs_v1.py` |
-| Link launch page ↔ mini website by contract address | `src/sambung_v1.py` |
-| Site verification for HEY Research | `src/fitur.py` |
+| Burn tracker, holders feed, bonding progress, referral board, kit of the day, embed badge | `src/features_core.py` |
+| Mini token websites `/s/<slug>` | `src/features_core.py`, `src/static/site.html` |
+| Launch pages on `/k/<id>`: CA, buy on pons, explorer, socials, on-chain ticker check | `src/launch_page.py` |
+| Launch page showcase on the homepage | `src/showcase.py` |
+| Bring your own logo for launch pages | `src/custom_logo.py` |
+| Own logo also on mini websites | `src/site_logo.py` |
+| Link launch page ↔ mini website by contract address | `src/site_link.py` |
+| Site verification for HEY Research, GitHub footer link | `src/features.py` |
+| One-time upgrade of data saved in browsers by older versions | `src/static/upgrade.js` |
 
 ## $ORYNX holder perks
 
@@ -54,10 +55,10 @@ python app.py             # http://localhost:8000
 
 ## How the code is organised
 
-`app.py` is the core app. It calls `fitur.pasang(app, globals())` at the end. Each feature file adds one layer and loads the one before it:
+`app.py` is the core app. It calls `features.install(app, globals())` at the end. Each feature file adds one layer and loads the one before it:
 
 ```
-app.py → fitur.py → sambung_v1.py → situs_v1.py → logo_v1.py → pamer_v1.py → launch_v1.py → fitur_lama.py
+app.py → features.py → site_link.py → site_logo.py → custom_logo.py → showcase.py → launch_page.py → features_core.py
 ```
 
 ## Notes

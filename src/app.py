@@ -839,7 +839,7 @@ async def page_main():
     return page.replace("{{NAME_BOT}}", NAME_BOT)
 
 
-@app.get("/api/left")
+@app.get("/api/quota")
 async def left(request: Request):
     address = read_cookie(request) if GATING_ACTIVE else None
     holder, balance = await status_holder(address)
@@ -881,7 +881,7 @@ async def login_wallet(data: WalletRequest, response: Response):
     return {"wallet": address, "holder": holder, "balance": balance, "min_hold": MIN_HOLD}
 
 
-@app.post("/api/wallet/out")
+@app.post("/api/wallet/logout")
 async def logout_wallet(response: Response):
     response.delete_cookie(COOKIE)
     return {"ok": True}
@@ -1147,7 +1147,7 @@ class LikesRequest(BaseModel):
     id: str = Field(pattern=r"^[0-9a-f]{12}$")
 
 
-@app.post("/api/gallery/likes")
+@app.post("/api/gallery/like")
 async def likes_kit(data: LikesRequest, request: Request):
     if not (REDIS_URL and REDIS_TOKEN):
         raise HTTPException(503, "The community gallery is warming up. Try again later.")

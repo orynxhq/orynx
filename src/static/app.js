@@ -52,7 +52,7 @@ const num = (n) => Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 
 
 async function loadQuota() {
   try {
-    const s = await api("/api/left");
+    const s = await api("/api/quota");
     $("quota").textContent = `Free today: ${s.kit} kit${s.kit === 1 ? "" : "s"} and ${s.logo} logo${s.logo === 1 ? "" : "s"} left`;
     gating = !!s.gating; holder = !!s.holder;
     if (s.total) { $("totalNum").textContent = num(s.total); $("totalKit").hidden = false; $("metaRight").hidden = true; }
@@ -132,7 +132,7 @@ async function connectWallet() {
   hideError();
   const btn = $("walletBtn");
   if (btn.dataset.state === "on") {
-    await api("/api/wallet/out", {});
+    await api("/api/wallet/logout", {});
     if (wcProv && wcProv.session) { try { await wcProv.disconnect(); } catch (_) {} wcProv = null; }
     return loadQuota();
   }
@@ -515,7 +515,7 @@ async function doLike(it, button, cnt) {
   button.classList.add("on", "pop"); setTimeout(() => button.classList.remove("pop"), 180);
   cnt.textContent = (Number(cnt.textContent) || 0) + 1;
   try {
-    const h = await api("/api/gallery/likes", { id: it.id });
+    const h = await api("/api/gallery/like", { id: it.id });
     document.querySelectorAll(".ex-like").forEach((b) => { if (b.getAttribute("aria-label") === button.getAttribute("aria-label")) { b.classList.add("on"); b.lastChild.textContent = h.likes; } });
     try { localStorage.setItem(KEY_LIKES, JSON.stringify([...listLikes(), it.id].slice(-500))); } catch (_) {}
   } catch (err) {
