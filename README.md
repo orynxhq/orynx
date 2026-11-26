@@ -4,6 +4,8 @@
 
 Live: **[orynxai.xyz](https://orynxai.xyz)** · X: [@orynxhq](https://x.com/orynxhq) · Token: `$ORYNX` on Robinhood Chain
 
+[![Orynx on HEY Research Lab](https://heyresearch.xyz/api/badge/orynx)](https://heyresearch.xyz/project/orynx?utm_source=badge&utm_medium=readme)
+
 ```
 $ORYNX contract: 0x5f19286a65d33e7c76b2c8c07ccbd4310aefbf20
 ```
