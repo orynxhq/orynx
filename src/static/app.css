@@ -61,7 +61,7 @@
   .own input{height:46px;background:var(--raise);border:1px solid var(--rule-d);border-radius:12px;color:var(--paper);font:15px var(--body);padding:0 14px;width:100%}
   .own input::placeholder{color:#5e5e5e}
   .own input:focus{outline:none;border-color:var(--paper)}
-  #tickerSendiri{text-transform:uppercase;letter-spacing:.04em}
+  #tickerOwn{text-transform:uppercase;letter-spacing:.04em}
   .ideas{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
   .idea{background:none;border:1px solid var(--rule-d);color:var(--graphite);border-radius:999px;padding:6px 12px;font:13px var(--body);cursor:pointer}
   .idea:hover{color:var(--paper);border-color:#4a4a4a}
@@ -77,9 +77,9 @@
   .stat b{display:block;font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.02em}
   .stat span{color:var(--graphite);font-size:14px}
 
-  #hasil{display:none;border-bottom:1px solid var(--rule-d)}
-  #hasil.show{display:block}
-  #hasil .shell{padding-top:56px;padding-bottom:72px}
+  #result{display:none;border-bottom:1px solid var(--rule-d)}
+  #result.show{display:block}
+  #result .shell{padding-top:56px;padding-bottom:72px}
   .result-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:36px;max-width:760px}
   .avatar{flex:none;width:44px;height:44px;border:1px solid var(--rule-d);border-radius:50%;display:grid;place-items:center;padding:9px;--cut:var(--ink)}
   .avatar svg{width:100%;height:100%}
@@ -219,7 +219,7 @@
     background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);opacity:0}
   .pill.solid:hover::after{animation:sheen .8s ease}
   @keyframes sheen{0%{left:-60%;opacity:1}100%{left:130%;opacity:1}}
-  #hasil{background:radial-gradient(ellipse 60% 40% at 30% 0%,rgba(255,255,255,.06),transparent 70%)}
+  #result{background:radial-gradient(ellipse 60% 40% at 30% 0%,rgba(255,255,255,.06),transparent 70%)}
   .light{background:radial-gradient(ellipse 70% 60% at 85% 0%,#f0f0f0,transparent 70%),var(--paper)}
   #kit{background:radial-gradient(ellipse 50% 60% at 0% 100%,rgba(255,255,255,.05),transparent 70%)}
   .ticker{background:linear-gradient(100deg,#000 0%,#000 40%,#7a7a7a 50%,#000 60%,#000 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:tickerlight 6s ease-in-out infinite}
@@ -311,7 +311,7 @@
     .stat span{font-size:12px;line-height:1.35;display:block}
     .ex-head{flex-direction:column;align-items:flex-start}
     .gallery{grid-template-columns:1fr;gap:12px}
-    #hasil .shell{padding-top:40px}
+    #result .shell{padding-top:40px}
     .result-head p{font-size:17px}
     .band{padding:56px 0}
   }
@@ -342,14 +342,14 @@
   .restored{font-size:13px;color:var(--graphite)}
   .restored[hidden]{display:none}
   .restored button{background:none;border:0;padding:0;color:var(--paper);font:600 13px var(--body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-left:6px}
-  .kom{margin-bottom:56px}
+  .com{margin-bottom:56px}
   .fresh{padding:clamp(48px,7vw,88px) 0 0}
   .fresh:not(.on){display:none}
   .fresh .ex-head h2{margin:0 0 8px}
   .fresh .ca-live{margin-bottom:12px}
   @media (max-width:560px){.fresh .gallery{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:86%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-right:-20px;padding-right:20px}.fresh .gallery::-webkit-scrollbar{display:none}.fresh .ex{scroll-snap-align:start}}
-  .kom[hidden]{display:none}
-  .kom .ex-logo{object-fit:cover}
+  .com[hidden]{display:none}
+  .com .ex-logo{object-fit:cover}
   .ex-del{position:absolute;top:12px;right:12px;z-index:2;background:#000;border:1px solid #444;color:#fff;border-radius:999px;width:30px;height:30px;cursor:pointer}
   .ex-roast{margin:0;font-size:14px;color:var(--graphite);border-top:1px solid var(--rule-d);padding-top:12px}
   .ex-roast b{color:#dcdcdc;font-weight:600}

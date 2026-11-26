@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{{NAMA}} {{TICKER_DOLAR}}</title>
+<title>{{NAME}} {{TICKER_DOLLAR}}</title>
 <meta name="description" content="{{TAGLINE}}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="{{NAMA}} {{TICKER_DOLAR}}">
+<meta property="og:title" content="{{NAME}} {{TICKER_DOLLAR}}">
 <meta property="og:description" content="{{TAGLINE}}">
 <meta property="og:image" content="{{URL}}/logo.png">
 <meta property="og:url" content="{{URL}}">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="{{NAMA}} {{TICKER_DOLAR}}">
+<meta name="twitter:title" content="{{NAME}} {{TICKER_DOLLAR}}">
 <meta name="twitter:description" content="{{TAGLINE}}">
 <meta name="twitter:image" content="{{URL}}/logo.png">
 <meta name="theme-color" content="{{BG}}">
@@ -88,36 +88,36 @@ footer a{font-weight:700;color:var(--ink)}
 <body>
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="#top"><img src="{{PATH}}/logo.png" alt="">{{NAMA}}</a>
+    <a class="brand" href="#top"><img src="{{PATH}}/logo.png" alt="">{{NAME}}</a>
     <nav class="soc" aria-label="Social links">{{SOC}}</nav>
   </header>
 
   <main id="top">
     <div class="hero">
       <div>
-        <span class="tk"><i></i>{{TICKER_DOLAR_ATAU}} · {{LABEL_CHAIN}}</span>
-        <h1>{{NAMA}}</h1>
+        <span class="tk"><i></i>{{TICKER_DOLLAR_OR}} · {{LABEL_CHAIN}}</span>
+        <h1>{{NAME}}</h1>
         <p class="tag">{{TAGLINE}}</p>
         <div class="cta">{{CTA}}</div>
       </div>
-      <div class="art"><div class="halo"></div><img src="{{PATH}}/logo.png" alt="{{NAMA}} logo"></div>
+      <div class="art"><div class="halo"></div><img src="{{PATH}}/logo.png" alt="{{NAME}} logo"></div>
     </div>
 
-    {{CA_BLOK}}
+    {{CA_BLOCK}}
 
     <section class="about" aria-labelledby="about-h">
-      <h2 id="about-h">About {{NAMA}}</h2>
-      <p>{{DESKRIPSI}}</p>
+      <h2 id="about-h">About {{NAME}}</h2>
+      <p>{{DESCRIPTION}}</p>
     </section>
 
     <section aria-labelledby="pts-h">
-      <h2 id="pts-h">{{JUDUL_FITUR}}</h2>
-      <div class="cards">{{FITUR}}</div>
+      <h2 id="pts-h">{{TITLE_FEATURES}}</h2>
+      <div class="cards">{{FEATURES}}</div>
     </section>
 
     <section aria-labelledby="buy-h">
-      <h2 id="buy-h">How to get {{TICKER_DOLAR_ATAU}}</h2>
-      <div class="steps">{{LANGKAH}}</div>
+      <h2 id="buy-h">How to get {{TICKER_DOLLAR_OR}}</h2>
+      <div class="steps">{{STEPS}}</div>
     </section>
   </main>
 
@@ -131,8 +131,8 @@ footer a{font-weight:700;color:var(--ink)}
   var b=document.getElementById('cpy');
   if(b){b.onclick=function(){var t=document.getElementById('ca').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1400)}).catch(function(){})}}
   var bd=document.getElementById('bond');
-  if(bd){fetch(bd.dataset.src).then(function(r){return r.json()}).then(function(h){if(!h.ada)return;bd.hidden=false;var p=Math.max(0,Math.min(100,h.persen));document.getElementById('bp').textContent=p.toFixed(1)+'%';
-    document.getElementById('bn').textContent=h.lulus?'Graduated to a locked Uniswap v4 pool':(h.saat_ini.toFixed(3)+' of '+h.ambang.toFixed(2)+' ETH on the pons curve');requestAnimationFrame(function(){document.getElementById('bf').style.width=Math.max(2,p)+'%'})}).catch(function(){})}
+  if(bd){fetch(bd.dataset.src).then(function(r){return r.json()}).then(function(h){if(!h.present)return;bd.hidden=false;var p=Math.max(0,Math.min(100,h.percent));document.getElementById('bp').textContent=p.toFixed(1)+'%';
+    document.getElementById('bn').textContent=h.graduated?'Graduated to a locked Uniswap v4 pool':(h.current.toFixed(3)+' of '+h.threshold.toFixed(2)+' ETH on the pons curve');requestAnimationFrame(function(){document.getElementById('bf').style.width=Math.max(2,p)+'%'})}).catch(function(){})}
 })();
 </script>
 </body>

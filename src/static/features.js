@@ -2,17 +2,17 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
-  const pendek = (a) => a.slice(0, 6) + "…" + a.slice(-4);
-  const halusTidak = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const simpan = (k, v) => { try { localStorage.setItem(k, v); } catch (_) {} };
-  const baca = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
+  const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const save = (k, v) => { try { localStorage.setItem(k, v); } catch (_) {} };
+  const read = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
   async function api(url, data) {
     const r = await fetch(url, { method: data ? "POST" : "GET", headers: { "Content-Type": "application/json" }, body: data ? JSON.stringify(data) : undefined });
-    let isi = {}; try { isi = await r.json(); } catch (_) {}
-    if (!r.ok) throw new Error(typeof isi.detail === "string" ? isi.detail : "Something went wrong. Try again in a moment.");
-    return isi;
+    let fill = {}; try { fill = await r.json(); } catch (_) {}
+    if (!r.ok) throw new Error(typeof fill.detail === "string" ? fill.detail : "Something went wrong. Try again in a moment.");
+    return fill;
   }
-  function lalu(det) {
+  function then(det) {
     if (!det) return "";
     const s = Math.max(0, Date.now() / 1000 - det);
     if (s < 60) return "just now";
@@ -20,8 +20,8 @@
     if (s < 86400) return Math.floor(s / 3600) + "h ago";
     return Math.floor(s / 86400) + "d ago";
   }
-  const tglPendek = (ts) => new Date(ts * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  const halamanKini = () => { const h = decodeURIComponent(location.hash.slice(1)); return ({ examples: "examples", token: "token", faq: "faq", consult: "consult" })[h] || "home"; };
+  const dateShort = (ts) => new Date(ts * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const pageNow = () => { const h = decodeURIComponent(location.hash.slice(1)); return ({ examples: "examples", token: "token", faq: "faq", consult: "consult" })[h] || "home"; };
 
   const st = document.createElement("style");
   st.textContent = `
@@ -65,7 +65,7 @@
   /* ---------------- 1. Bonding milestones ---------------- */
   const MS = [25, 50, 75, 100];
   function confetti() {
-    if (halusTidak) return;
+    if (reducedMotion) return;
     const cv = document.createElement("canvas"); cv.id = "confetti"; document.body.appendChild(cv);
     const c = cv.getContext("2d"), r = devicePixelRatio || 1;
     cv.width = innerWidth * r; cv.height = innerHeight * r; c.scale(r, r);
@@ -78,11 +78,11 @@
     };
     requestAnimationFrame(f);
   }
-  async function hiasBonding(holdersN) {
+  async function decorateBonding(holdersN) {
     const box = $("bond"); if (!box) return false;
     let h; try { h = await api("/api/bonding"); } catch (_) { return true; }
-    if (!h.ada) return true;
-    const pct = h.lulus ? 100 : h.persen;
+    if (!h.present) return true;
+    const pct = h.graduated ? 100 : h.percent;
     const bar = $("bondBar");
     if (bar && !bar.querySelector(".tk")) [25, 50, 75].forEach((m) => { const i = document.createElement("span"); i.className = "tk"; i.style.left = m + "%"; bar.appendChild(i); });
     let row = box.querySelector(".ms-row");
@@ -90,28 +90,28 @@
     row.replaceChildren(...MS.map((m) => { const s = document.createElement("span"); s.textContent = m === 100 ? "Graduate" : m + "%"; if (pct >= m) s.className = "on"; return s; }));
     let hold = box.querySelector(".bond-hold");
     if (holdersN) { if (!hold) { hold = document.createElement("p"); hold.className = "bond-hold"; box.appendChild(hold); } hold.textContent = `${fmt(holdersN)} wallets hold $ORYNX`; }
-    const capai = MS.filter((m) => pct >= m).pop() || 0;
-    const lama = Number(baca("orynx_ms") || 0);
-    if (capai > lama) {
+    const reached = MS.filter((m) => pct >= m).pop() || 0;
+    const old = Number(read("orynx_ms") || 0);
+    if (reached > old) {
       let hit = box.querySelector(".ms-hit");
       if (!hit) { hit = document.createElement("div"); hit.className = "ms-hit"; box.appendChild(hit); }
-      const teks = capai === 100 ? "$ORYNX graduated from the pons curve!" : `$ORYNX passed ${capai}% on the pons curve`;
+      const text = reached === 100 ? "$ORYNX graduated from the pons curve!" : `$ORYNX passed ${reached}% on the pons curve`;
       const a = document.createElement("a"); a.target = "_blank"; a.rel = "noopener"; a.textContent = "Share on X";
-      a.href = "https://x.com/intent/post?text=" + encodeURIComponent(`${teks} 📈\n\nTrack it live on Robinhood Chain:\norynxai.xyz`);
-      const sp = document.createElement("span"); sp.textContent = "🎉 " + teks;
+      a.href = "https://x.com/intent/post?text=" + encodeURIComponent(`${text} 📈\n\nTrack it live on Robinhood Chain:\norynxai.xyz`);
+      const sp = document.createElement("span"); sp.textContent = "🎉 " + text;
       hit.replaceChildren(sp, a); hit.classList.add("on");
-      if (lama > 0 || capai === 100) { if (capai === 100) confetti(); }
-      simpan("orynx_ms", String(capai));
+      if (old > 0 || reached === 100) { if (reached === 100) confetti(); }
+      save("orynx_ms", String(reached));
     }
     return true;
   }
 
   /* ---------------- 2. Live holders feed ---------------- */
   const LABEL = { buy: "Buy", sell: "Sell", burn: "Burn", transfer: "Transfer" };
-  function pasangFeed() {
+  function installFeed() {
     if ($("feed")) return;
     const sec = document.createElement("section");
-    sec.className = "band"; sec.id = "feed"; sec.dataset.page = "token"; sec.hidden = halamanKini() !== "token";
+    sec.className = "band"; sec.id = "feed"; sec.dataset.page = "token"; sec.hidden = pageNow() !== "token";
     sec.innerHTML = `<div class="shell"><div class="feed-card">
       <div><span class="ca-live"><i></i>Live on Robinhood Chain</span><p class="feed-num" id="feedNum">0</p><p style="margin:0;color:#9a9a9a">wallets hold $ORYNX right now, read straight from the chain.</p></div>
       <div><h3 style="margin:0 0 8px">Latest activity</h3><ul class="feed-list" id="feedList"><li class="feed-empty">Loading the latest moves…</li></ul></div>
@@ -119,18 +119,18 @@
     const ref = $("burn") || $("token");
     ref.insertAdjacentElement("afterend", sec);
   }
-  async function muatFeed() {
+  async function loadFeed() {
     let h; try { h = await api("/api/holders"); } catch (_) { return 0; }
-    if (!h.ada) { const f = $("feed"); if (f) f.remove(); return 0; }
-    pasangFeed();
+    if (!h.present) { const f = $("feed"); if (f) f.remove(); return 0; }
+    installFeed();
     $("feedNum").textContent = fmt(h.holders);
     const list = $("feedList");
     if (!h.feed.length) { list.innerHTML = '<li class="feed-empty">No moves yet. Be the first.</li>'; return h.holders; }
     list.replaceChildren(...h.feed.map((x) => {
       const li = document.createElement("li");
-      const j = document.createElement("span"); j.className = "jn " + x.jenis; j.textContent = LABEL[x.jenis] || x.jenis;
-      const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = fmt(x.jumlah) + " $ORYNX";
-      const w = document.createElement("div"); w.className = "who"; w.textContent = pendek(x.siapa) + (x.waktu ? " · " + lalu(x.waktu) : "");
+      const j = document.createElement("span"); j.className = "jn " + x.kind; j.textContent = LABEL[x.kind] || x.kind;
+      const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = fmt(x.count) + " $ORYNX";
+      const w = document.createElement("div"); w.className = "who"; w.textContent = short(x.who) + (x.time ? " · " + then(x.time) : "");
       d.append(b, w);
       const a = document.createElement("a"); a.href = "https://robin.etherscan.io/tx/" + x.tx; a.target = "_blank"; a.rel = "noopener"; a.textContent = "View tx";
       li.append(j, d, a); return li;
@@ -139,12 +139,12 @@
   }
 
   /* ---------------- 7. Kit of the day ---------------- */
-  async function muatKotd() {
+  async function loadKotd() {
     let h; try { h = await api("/api/kotd"); } catch (_) { return; }
-    if (!h.ada || $("kotd")) return;
+    if (!h.present || $("kotd")) return;
     const it = h.item, url = `${location.origin}/k/${it.id}`;
     const sec = document.createElement("section");
-    sec.className = "band"; sec.id = "kotd"; sec.dataset.page = "home"; sec.hidden = halamanKini() !== "home";
+    sec.className = "band"; sec.id = "kotd"; sec.dataset.page = "home"; sec.hidden = pageNow() !== "home";
     sec.innerHTML = `<div class="shell"><div class="kotd-card">
       <img alt="" id="kotdImg"><div>
       <span class="ca-live"><i></i>Kit of the day</span>
@@ -154,24 +154,24 @@
       </div></div></div>`;
     const ref = $("fresh") || $("mykits");
     ref.insertAdjacentElement("beforebegin", sec);
-    $("kotdImg").src = `/api/galeri/logo/${it.id}`; $("kotdImg").alt = `${it.nama} logo`;
-    $("kotdName").textContent = it.nama; $("kotdTk").textContent = it.ticker ? "$" + it.ticker : "";
+    $("kotdImg").src = `/api/gallery/logo/${it.id}`; $("kotdImg").alt = `${it.name} logo`;
+    $("kotdName").textContent = it.name; $("kotdTk").textContent = it.ticker ? "$" + it.ticker : "";
     $("kotdTag").textContent = it.tagline || "";
     $("kotdRoast").textContent = it.roast ? "Si Dev: " + it.roast : "";
     $("kotdOpen").href = `/k/${it.id}`;
     $("kotdRemix").href = `/?remix=${it.id}#build`;
-    $("kotdX").href = "https://x.com/intent/post?text=" + encodeURIComponent(`Today's Orynx Kit of the day 🏆\n\n${it.nama}${it.ticker ? " $" + it.ticker : ""}\n${it.tagline || ""}\n\n${url}`);
+    $("kotdX").href = "https://x.com/intent/post?text=" + encodeURIComponent(`Today's Orynx Kit of the day 🏆\n\n${it.name}${it.ticker ? " $" + it.ticker : ""}\n${it.tagline || ""}\n\n${url}`);
   }
 
   /* ---------------- 10 + 11. Embed badge with holder early access ---------------- */
   let early = {};
-  async function muatEarly() {
-    try { const h = await api("/api/early"); (h.fitur || []).forEach((f) => { early[f.id] = f; }); } catch (_) {}
+  async function loadEarly() {
+    try { const h = await api("/api/early"); (h.features || []).forEach((f) => { early[f.id] = f; }); } catch (_) {}
   }
-  function pasangBadge() {
+  function installBadge() {
     const ref = $("refBox"); if (!ref || $("bdg")) return;
     const e = early.badge;
-    const pill = e && !e.terbuka ? `<span class="early-pill"><i></i>Holder early access · everyone from ${tglPendek(e.publik)}</span>` : '<span class="ca-live"><i></i>New</span>';
+    const pill = e && !e.opened ? `<span class="early-pill"><i></i>Holder early access · everyone from ${dateShort(e.public)}</span>` : '<span class="ca-live"><i></i>New</span>';
     const div = document.createElement("div"); div.className = "bdg"; div.id = "bdg";
     div.innerHTML = `<div>${pill}<h2>Show your bonding progress anywhere</h2>
       <p>Paste your pons token's contract address and get a live badge for your website: your token, its bonding bar, and a link back to Orynx.</p>
@@ -189,38 +189,38 @@
         const h = await api("/api/badge", { token: t });
         const out = $("bdgOut");
         const fr = document.createElement("iframe"); fr.src = h.url; fr.title = "Badge preview"; fr.loading = "lazy";
-        const code = document.createElement("div"); code.className = "bdg-code"; code.textContent = h.kode;
+        const code = document.createElement("div"); code.className = "bdg-code"; code.textContent = h.code;
         const cp = document.createElement("button"); cp.className = "pill line"; cp.type = "button"; cp.textContent = "Copy code"; cp.style.marginTop = "12px";
-        cp.onclick = () => navigator.clipboard.writeText(h.kode).then(() => { cp.textContent = "Copied"; setTimeout(() => cp.textContent = "Copy code", 1400); }).catch(() => {});
+        cp.onclick = () => navigator.clipboard.writeText(h.code).then(() => { cp.textContent = "Copied"; setTimeout(() => cp.textContent = "Copy code", 1400); }).catch(() => {});
         const tip = document.createElement("p"); tip.style.cssText = "font-size:13px;color:#8c8c8c;margin:10px 0 0"; tip.textContent = "Paste this code where you want the badge on your site. It updates by itself.";
         out.replaceChildren(fr, code, cp, tip);
       } catch (err) { msg.textContent = err.message; msg.hidden = false; }
       finally { btn.disabled = false; btn.textContent = "Get my badge"; }
     });
   }
-  function pasangEarlyToken() {
+  function installEarlyToken() {
     const e = early.badge; const perks = document.querySelector("#token .perks");
-    if (!e || e.terbuka || !perks || $("earlyCard")) return;
+    if (!e || e.opened || !perks || $("earlyCard")) return;
     const d = document.createElement("div"); d.className = "early-card"; d.id = "earlyCard";
-    d.innerHTML = `<b>Now in holder early access: Embed badge</b><span>Holders of 1M $ORYNX can use it today. It opens to everyone on ${tglPendek(e.publik)}.</span>`;
+    d.innerHTML = `<b>Now in holder early access: Embed badge</b><span>Holders of 1M $ORYNX can use it today. It opens to everyone on ${dateShort(e.public)}.</span>`;
     perks.insertAdjacentElement("afterend", d);
   }
 
 
   /* ---------------- Mini site builder ---------------- */
-  const TEMA_MS = [
-    { id: "night", nama: "Night", w: ["#08080a", "#c9b8ff"] },
-    { id: "pop", nama: "Pop", w: ["#c9b8ff", "#111111"] },
-    { id: "paper", nama: "Paper", w: ["#f4f1ea", "#141414"] },
+  const THEME_MS = [
+    { id: "night", name: "Night", w: ["#08080a", "#c9b8ff"] },
+    { id: "pop", name: "Pop", w: ["#c9b8ff", "#111111"] },
+    { id: "paper", name: "Paper", w: ["#f4f1ea", "#141414"] },
   ];
   const st2 = document.createElement("style");
   st2.textContent = `
   .ms-sub{margin:0 0 14px;color:var(--graphite,#9a9a9a);font-size:14px}
-  .ms-tema{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
-  .ms-tema button{display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding:10px;border-radius:14px;border:1px solid #2e2e2e;background:#0b0b0d;color:#fff;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
-  .ms-tema button[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 1px #fff}
-  .ms-tema i{display:block;width:100%;height:38px;border-radius:9px;position:relative;overflow:hidden}
-  .ms-tema i b{position:absolute;left:8px;bottom:8px;width:44%;height:8px;border-radius:4px}
+  .ms-theme{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+  .ms-theme button{display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding:10px;border-radius:14px;border:1px solid #2e2e2e;background:#0b0b0d;color:#fff;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
+  .ms-theme button[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 1px #fff}
+  .ms-theme i{display:block;width:100%;height:38px;border-radius:9px;position:relative;overflow:hidden}
+  .ms-theme i b{position:absolute;left:8px;bottom:8px;width:44%;height:8px;border-radius:4px}
   .ms-in{display:grid;gap:8px;margin-bottom:12px}
   .ms-in input{background:#000;border:1px solid #333;border-radius:12px;padding:12px 14px;color:#fff;font:inherit;font-size:14px;min-width:0}
   .ms-out{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}.ms-out[hidden],#siteGroup[hidden]{display:none}
@@ -229,35 +229,35 @@
   `;
   document.head.appendChild(st2);
   const SITES = "orynx_sites";
-  const bacaSites = () => { try { return JSON.parse(localStorage.getItem(SITES) || "{}"); } catch (_) { return {}; } };
-  function kitKini() {
-    try { if (typeof kitAktif !== "undefined" && kitAktif && kitAktif.kit) return kitAktif; } catch (_) {}
+  const readSites = () => { try { return JSON.parse(localStorage.getItem(SITES) || "{}"); } catch (_) { return {}; } };
+  function kitNow() {
+    try { if (typeof kitActive !== "undefined" && kitActive && kitActive.kit) return kitActive; } catch (_) {}
     try { return JSON.parse(localStorage.getItem("orynx_kit_v1") || "null"); } catch (_) { return null; }
   }
-  function logoKini() {
+  function logoNow() {
     const a = document.querySelector("#logos .logo.pick a") || document.querySelector("#logos .logo a");
     return a && a.dataset.sig ? { src: a.href, sig: a.dataset.sig } : null;
   }
-  async function warnaLogo(src) {
+  async function colorLogo(src) {
     const im = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = src; });
     const cv = document.createElement("canvas"); cv.width = cv.height = 16; const c = cv.getContext("2d"); c.drawImage(im, 0, 0, 16, 16);
     const d = c.getImageData(0, 0, 16, 16).data; const hx = (r, g, b) => "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
-    const dasar = hx(d[0], d[1], d[2]);
-    let best = null, skor = -1;
+    const basic = hx(d[0], d[1], d[2]);
+    let best = null, score = -1;
     for (let i = 0; i < d.length; i += 4) {
       const r = d[i], g = d[i + 1], b = d[i + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
       const sat = mx ? (mx - mn) / mx : 0; const sk = sat * (l > .25 && l < .92 ? 1 : .2);
-      if (sk > skor) { skor = sk; best = hx(r, g, b); }
+      if (sk > score) { score = sk; best = hx(r, g, b); }
     }
-    return { dasar, aksen: skor > .15 ? best : "#ffffff" };
+    return { basic, accent: score > .15 ? best : "#ffffff" };
   }
-  let temaPilih = "night";
-  function pasangSite() {
+  let themePick = "night";
+  function installSite() {
     const ref = $("threadGroup"); if (!ref || $("siteGroup")) return;
     const g = document.createElement("div"); g.className = "group"; g.id = "siteGroup";
     g.innerHTML = `<h3>Mini website <span>(free, hosted on orynxai.xyz)</span></h3>
       <p class="ms-sub">Turn this kit into a one-page site for your token. No coding needed. Add your contract address now or after you launch.</p>
-      <div class="ms-tema" role="group" aria-label="Site style">${TEMA_MS.map((t) => `<button type="button" data-t="${t.id}" aria-pressed="${t.id === temaPilih}"><i style="background:${t.w[0]}"><b style="background:${t.w[1]}"></b></i>${t.nama}</button>`).join("")}</div>
+      <div class="ms-theme" role="group" aria-label="Site style">${THEME_MS.map((t) => `<button type="button" data-t="${t.id}" aria-pressed="${t.id === themePick}"><i style="background:${t.w[0]}"><b style="background:${t.w[1]}"></b></i>${t.name}</button>`).join("")}</div>
       <div class="ms-in"><input id="msCa" maxlength="42" placeholder="Contract address (optional, 0x…)" aria-label="Contract address">
       <input id="msX" maxlength="60" placeholder="X handle, e.g. @yourtoken (optional)" aria-label="X handle">
       <input id="msTg" maxlength="80" placeholder="Telegram link, e.g. t.me/yourtoken (optional)" aria-label="Telegram link"></div>
@@ -265,71 +265,71 @@
       <p class="ms-msg" id="msMsg" hidden></p>
       <div class="ms-out" id="msOut" hidden><code id="msUrl"></code><a class="pill solid" id="msOpen" target="_blank" rel="noopener">Open site</a><button class="pill line" id="msCopy" type="button">Copy link</button><a class="pill line" id="msX2" target="_blank" rel="noopener">Post on X</a></div>`;
     ref.insertAdjacentElement("afterend", g);
-    g.querySelectorAll(".ms-tema button").forEach((b) => b.onclick = () => { temaPilih = b.dataset.t; g.querySelectorAll(".ms-tema button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); });
-    $("msBtn").onclick = terbitkan;
-    isiSite();
+    g.querySelectorAll(".ms-theme button").forEach((b) => b.onclick = () => { themePick = b.dataset.t; g.querySelectorAll(".ms-theme button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); });
+    $("msBtn").onclick = publish;
+    fillSite();
   }
-  function tampilHasilSite(r, k) {
+  function showResultSite(r, k) {
     $("msOut").hidden = false; $("msUrl").textContent = r.url.replace(/^https?:\/\//, "");
     $("msOpen").href = r.url; $("msCopy").onclick = () => navigator.clipboard.writeText(r.url).then(() => { $("msCopy").textContent = "Copied"; setTimeout(() => $("msCopy").textContent = "Copy link", 1400); }).catch(() => {});
-    const u = (k.kit.pilihan || [])[0] || {};
-    $("msX2").href = "https://x.com/intent/post?text=" + encodeURIComponent(`${u.nama || ""}${u.ticker ? " $" + u.ticker : ""} has a home now 🏠\n${k.kit.tagline || ""}\n\n${r.url}`);
+    const u = (k.kit.options || [])[0] || {};
+    $("msX2").href = "https://x.com/intent/post?text=" + encodeURIComponent(`${u.name || ""}${u.ticker ? " $" + u.ticker : ""} has a home now 🏠\n${k.kit.tagline || ""}\n\n${r.url}`);
     $("msBtn").textContent = "Update my site";
   }
-  function isiSite() {
+  function fillSite() {
     if (!$("siteGroup")) return;
-    const k = kitKini(); const s = k && bacaSites()[k.kid];
+    const k = kitNow(); const s = k && readSites()[k.kid];
     $("msOut").hidden = true; $("msMsg").hidden = true; $("msBtn").textContent = "Publish my site";
     ["msCa", "msX", "msTg"].forEach((id) => { $(id).value = ""; });
     if (s) {
       $("msCa").value = s.ca || ""; $("msX").value = s.x || ""; $("msTg").value = s.tg || "";
-      temaPilih = s.tema || "night"; document.querySelectorAll("#siteGroup .ms-tema button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.t === temaPilih)));
-      tampilHasilSite(s, k);
+      themePick = s.theme || "night"; document.querySelectorAll("#siteGroup .ms-theme button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.t === themePick)));
+      showResultSite(s, k);
     }
     $("siteGroup").hidden = !(k && k.sig);
   }
-  async function terbitkan() {
-    const k = kitKini(), logo = logoKini(), msg = $("msMsg"), btn = $("msBtn");
+  async function publish() {
+    const k = kitNow(), logo = logoNow(), msg = $("msMsg"), btn = $("msBtn");
     msg.hidden = true; msg.className = "ms-msg";
     if (!k || !k.sig) { msg.textContent = "Build a kit first."; msg.hidden = false; return; }
     if (!logo) { msg.textContent = "Wait for your logos, then publish."; msg.hidden = false; return; }
     const ca = $("msCa").value.trim();
     if (ca && !/^0x[0-9a-fA-F]{40}$/.test(ca)) { msg.textContent = "That contract address doesn't look right. It starts with 0x and has 42 characters."; msg.className = "ms-msg err"; msg.hidden = false; return; }
-    const awal = btn.textContent; btn.disabled = true; btn.textContent = "Publishing…";
+    const start = btn.textContent; btn.disabled = true; btn.textContent = "Publishing…";
     try {
-      const w = await warnaLogo(logo.src).catch(() => ({ dasar: "#111111", aksen: "#ffffff" }));
-      const u = (k.kit.pilihan || [])[0] || {}; const lama = bacaSites()[k.kid] || {};
-      const r = await api("/api/site", { nama: u.nama || "", ticker: u.ticker || "", tagline: k.kit.tagline || "", roast: k.kit.roast || "", mode: k.mode || "ai", sig: k.sig,
-        deskripsi: k.kit.deskripsi || "", fitur: k.kit.fitur || [], logo: logo.src.split(",")[1], logo_sig: logo.sig,
-        ca, x: $("msX").value.trim(), tg: $("msTg").value.trim(), tema: temaPilih, dasar: w.dasar, aksen: w.aksen, slug: lama.slug || "", kunci: lama.kunci || "" });
-      const semua = bacaSites(); semua[k.kid] = { slug: r.slug, kunci: r.kunci, url: r.url, ca, x: $("msX").value.trim(), tg: $("msTg").value.trim(), tema: temaPilih };
-      simpan(SITES, JSON.stringify(semua));
-      tampilHasilSite(r, k);
-      msg.textContent = lama.slug ? "Updated. Changes show up within a minute." : "Your site is live. Share the link!"; msg.hidden = false;
-    } catch (err) { msg.textContent = err.message; msg.className = "ms-msg err"; msg.hidden = false; btn.textContent = awal; }
+      const w = await colorLogo(logo.src).catch(() => ({ basic: "#111111", accent: "#ffffff" }));
+      const u = (k.kit.options || [])[0] || {}; const old = readSites()[k.kid] || {};
+      const r = await api("/api/site", { name: u.name || "", ticker: u.ticker || "", tagline: k.kit.tagline || "", roast: k.kit.roast || "", mode: k.mode || "ai", sig: k.sig,
+        description: k.kit.description || "", features: k.kit.features || [], logo: logo.src.split(",")[1], logo_sig: logo.sig,
+        ca, x: $("msX").value.trim(), tg: $("msTg").value.trim(), theme: themePick, basic: w.basic, accent: w.accent, slug: old.slug || "", key: old.key || "" });
+      const entries = readSites(); entries[k.kid] = { slug: r.slug, key: r.key, url: r.url, ca, x: $("msX").value.trim(), tg: $("msTg").value.trim(), theme: themePick };
+      save(SITES, JSON.stringify(entries));
+      showResultSite(r, k);
+      msg.textContent = old.slug ? "Updated. Changes show up within a minute." : "Your site is live. Share the link!"; msg.hidden = false;
+    } catch (err) { msg.textContent = err.message; msg.className = "ms-msg err"; msg.hidden = false; btn.textContent = start; }
     finally { btn.disabled = false; }
   }
-  function awasiKit() {
-    pasangSite();
+  function watchKit() {
+    installSite();
     try {
-      const asli = Storage.prototype.setItem; let t2 = null;
-      Storage.prototype.setItem = function (k, v) { const r = asli.call(this, k, v); if (k === "orynx_kit_v1") { clearTimeout(t2); t2 = setTimeout(isiSite, 150); } return r; };
+      const original = Storage.prototype.setItem; let t2 = null;
+      Storage.prototype.setItem = function (k, v) { const r = original.call(this, k, v); if (k === "orynx_kit_v1") { clearTimeout(t2); t2 = setTimeout(fillSite, 150); } return r; };
     } catch (_) {}
     const roast = $("roast"); if (!roast) return;
-    let tunda = null;
-    new MutationObserver(() => { clearTimeout(tunda); tunda = setTimeout(isiSite, 400); }).observe(roast, { childList: true, characterData: true, subtree: true });
+    let timer = null;
+    new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(fillSite, 400); }).observe(roast, { childList: true, characterData: true, subtree: true });
   }
 
-  async function mulai() {
-    awasiKit();
-    await muatEarly();
-    pasangBadge(); pasangEarlyToken();
-    muatKotd();
-    const n = await muatFeed();
-    let coba = 0;
-    const tunggu = async () => { if (await hiasBonding(n) || ++coba > 20) return; setTimeout(tunggu, 700); };
-    tunggu();
-    setInterval(async () => { if (document.hidden) return; const m = await muatFeed(); hiasBonding(m); }, 60000);
+  async function t_start() {
+    watchKit();
+    await loadEarly();
+    installBadge(); installEarlyToken();
+    loadKotd();
+    const n = await loadFeed();
+    let attempt = 0;
+    const wait = async () => { if (await decorateBonding(n) || ++attempt > 20) return; setTimeout(wait, 700); };
+    wait();
+    setInterval(async () => { if (document.hidden) return; const m = await loadFeed(); decorateBonding(m); }, 60000);
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mulai); else mulai();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", t_start); else t_start();
 })();

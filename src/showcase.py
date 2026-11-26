@@ -1,24 +1,20 @@
 """
-Fitur Orynx (pintu masuk).
-- fitur_lama.py : burn tracker, referral, remix, launch thread
-- launch_v1.py  : launch page /k/<id> (CA, tombol beli, sosial, editor)
-- file ini      : bagian pamer launch page di halaman utama
-Dipasang dari app.py lewat pasang(app, globals()), sama seperti sebelumnya.
+Showcase layer: the launch page / mini website section on the home page.
 """
 
 from fastapi import Request
 from fastapi.responses import Response
 
-import launch_v1 as _lv
-from launch_v1 import *  # noqa: F401,F403
+import launch_page as _lv
+from launch_page import *  # noqa: F401,F403
 
 
-def __getattr__(nama):
-    return getattr(_lv, nama)
+def __getattr__(name):
+    return getattr(_lv, name)
 
 
 # ---------------------------------------------------------------------------
-# HALAMAN UTAMA: bagian pamer launch page (mini website)
+# HOME PAGE: launch page showcase section (mini website)
 # ---------------------------------------------------------------------------
 LOGO_FROG = ('<svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#1b1f4b"/><circle cx="392" cy="118" r="44" fill="#ffe27a"/><circle cx="410" cy="104" r="40" fill="#1b1f4b"/>'
              '<ellipse cx="256" cy="330" rx="170" ry="120" fill="#5fcf6b" stroke="#111" stroke-width="12"/><circle cx="186" cy="214" r="58" fill="#5fcf6b" stroke="#111" stroke-width="12"/>'
@@ -113,7 +109,7 @@ SHOWCASE = """
         <div class="lps-phone lps-p2" aria-label="Example launch page, AI project">
           <div class="lps-bar"><i></i><i></i><i></i><span class="lps-url">orynxai.xyz/k/27aa7e70067c</span><span class="lps-ex">Example</span></div>
           <div class="lps-body">
-            <div class="lps-top"><img src="/api/galeri/logo/27aa7e70067c" alt="Clause logo" loading="lazy"><div><div class="lps-chips"><span>Launching soon</span><span>AI project</span></div><b>Clause</b><code>$CLAUSE</code></div></div>
+            <div class="lps-top"><img src="/api/gallery/logo/27aa7e70067c" alt="Clause logo" loading="lazy"><div><div class="lps-chips"><span>Launching soon</span><span>AI project</span></div><b>Clause</b><code>$CLAUSE</code></div></div>
             <p class="lps-tag">Read the contract before it reads your wallet.</p>
             <div class="lps-soon">The contract address appears here the moment the token goes live on pons.</div>
             <div class="lps-soc"><span>𝕏 X</span><span>Telegram</span></div>
@@ -130,58 +126,58 @@ SHOWCASE = """
 </section>
 """
 
-KITLIST_BARU = '<li><b>Launch page</b><span>Once you are live on pons, your kit becomes a mini website for your token: CA, buy button, socials and story in one link.</span></li>'
+KITLIST_NEW = '<li><b>Launch page</b><span>Once you are live on pons, your kit becomes a mini website for your token: CA, buy button, socials and story in one link.</span></li>'
 
 
-# Tambahan skrip: tampilkan launch page yang sudah live di halaman utama
-PAMER_JS = r"""
-// 3b) Halaman utama: daftar launch page yang sudah live
-async function pamerLive() {
-  const wadah = document.getElementById("lpsCards"); if (!wadah || !live.size) return;
+# Extra script: show launch pages that are already live on the home page
+SHOWCASE_JS = r"""
+// 3b) Home page: list of launch pages that are live
+async function showcaseLive() {
+  const box = document.getElementById("lpsCards"); if (!box || !live.size) return;
   try {
-    const g = await (await fetch("/api/galeri")).json();
-    const semua = [...(g.items || []), ...(g.top || [])];
-    const sudah = new Set();
-    const kartu = semua.filter((it) => live.has(it.id) && !sudah.has(it.id) && sudah.add(it.id)).slice(0, 8).map((it) => {
+    const g = await (await fetch("/api/gallery")).json();
+    const entries = [...(g.items || []), ...(g.top || [])];
+    const already = new Set();
+    const card = entries.filter((it) => live.has(it.id) && !already.has(it.id) && already.add(it.id)).slice(0, 8).map((it) => {
       const a = document.createElement("a"); a.className = "lps-card"; a.href = `/k/${it.id}`;
-      const img = document.createElement("img"); img.loading = "lazy"; img.alt = ""; img.src = `/api/galeri/logo/${it.id}`;
-      const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = it.nama;
+      const img = document.createElement("img"); img.loading = "lazy"; img.alt = ""; img.src = `/api/gallery/logo/${it.id}`;
+      const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = it.name;
       const sm = document.createElement("small"); sm.textContent = (it.ticker ? "$" + it.ticker + " · " : "") + "Live on pons";
       d.append(b, sm); a.append(img, d); return a;
     });
-    if (kartu.length) { wadah.replaceChildren(...kartu); document.getElementById("lpsLive").hidden = false; }
+    if (card.length) { box.replaceChildren(...card); document.getElementById("lpsLive").hidden = false; }
   } catch (_) {}
 }
 """
 
-_lv.VERSI_JS = "2"
-_lv.JS = _lv.JS.replace("lencana();\n  new MutationObserver", "lencana(); pamerLive();\n  new MutationObserver", 1).replace(
-    "// 4) Halaman /k/<id>: editor launch page", PAMER_JS.strip() + "\n\n// 4) Halaman /k/<id>: editor launch page", 1)
+_lv.VERSION_JS = "2"
+_lv.JS = _lv.JS.replace("badge();\n  new MutationObserver", "badge(); showcaseLive();\n  new MutationObserver", 1).replace(
+    "// 4) /k/<id> page: launch page editor", SHOWCASE_JS.strip() + "\n\n// 4) /k/<id> page: launch page editor", 1)
 
 
-def _pasang_pamer(app):
+def _install_showcase(app):
     @app.middleware("http")
-    async def pamer_launch(request: Request, call_next):
+    async def showcase_launch(request: Request, call_next):
         resp = await call_next(request)
         if (request.url.path not in ("/", "/index.html") or request.method != "GET" or resp.status_code != 200
                 or resp.headers.get("content-encoding") or "html" not in resp.headers.get("content-type", "")):
             return resp
-        body = await _lv._baca_body(resp)
+        body = await _lv._read_body(resp)
         try:
             body = body.replace(b"/launch.js?v=1", b"/launch.js?v=2")
             if b'id="launchpage"' not in body:
                 body = body.replace(b'<section class="band hq" id="hq"', SHOWCASE.encode() + b'\n  <section class="band hq" id="hq"', 1)
                 body = body.replace(b"</ul>\n    </div>\n  </section>\n\n  <section class=\"light band\" id=\"token\"",
-                                    KITLIST_BARU.encode() + b"\n      </ul>\n    </div>\n  </section>\n\n  <section class=\"light band\" id=\"token\"", 1)
+                                    KITLIST_NEW.encode() + b"\n      </ul>\n    </div>\n  </section>\n\n  <section class=\"light band\" id=\"token\"", 1)
         except Exception:
             pass
-        return _lv._respon_baru(resp, body)
+        return _lv._response_new(resp, body)
 
 
-def pasang(app, g):
-    hasil = _lv.pasang(app, g)
+def install(app, g):
+    result = _lv.install(app, g)
     try:
-        _pasang_pamer(app)
+        _install_showcase(app)
     except Exception:
         pass
-    return hasil
+    return result

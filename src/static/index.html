@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=5">
+<link rel="stylesheet" href="/app.css?v=6">
 </head>
 <body>
 
@@ -76,7 +76,7 @@
     <div class="shell">
       <div>
         <h1 class="rise d1">Your token, launch‑ready in thirty seconds.</h1>
-        <p class="lede rise d2">AI project or meme coin, drop the idea. {{NAMA_BOT}}, our resident AI dev, roasts it, then builds the kit: <b>name, ticker, logo, tagline, story and your first posts</b>, ready for <a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">pons</a> on Robinhood Chain.</p>
+        <p class="lede rise d2">AI project or meme coin, drop the idea. {{NAME_BOT}}, our resident AI dev, roasts it, then builds the kit: <b>name, ticker, logo, tagline, story and your first posts</b>, ready for <a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">pons</a> on Robinhood Chain.</p>
 
         <div class="tool rise d3" id="build">
           <div class="modes" role="group" aria-label="Token type">
@@ -87,11 +87,11 @@
             <label for="ide" id="ideLabel">What does your AI project do?</label>
             <div class="field">
               <input id="ide" maxlength="200" placeholder="An AI agent that tracks whale wallets">
-              <button id="kirim" class="pill solid" type="submit">Build my kit</button>
+              <button id="send" class="pill solid" type="submit">Build my kit</button>
               <button class="own-toggle" id="ownToggle" type="button" aria-expanded="false" aria-controls="own">Have a name in mind?</button>
               <div class="own" id="own" hidden>
-                <input id="namaSendiri" maxlength="40" placeholder="Name (optional)" aria-label="Token name (optional)">
-                <input id="tickerSendiri" maxlength="8" placeholder="Ticker (optional)" aria-label="Ticker (optional)">
+                <input id="nameOwn" maxlength="40" placeholder="Name (optional)" aria-label="Token name (optional)">
+                <input id="tickerOwn" maxlength="8" placeholder="Ticker (optional)" aria-label="Ticker (optional)">
               </div>
             </div>
           </form>
@@ -99,7 +99,7 @@
           <a class="ask-link" href="#consult">Not sure yet? Ask Si Dev before you launch</a>
           <div class="status" id="status" role="status"><span class="spin"></span><span id="statusText"></span></div>
           <div class="error" id="error" role="alert"></div>
-          <div class="meta"><span id="quota">Free to use, no wallet needed.</span><span class="for-all" id="metaRight">For every dev on Robinhood Chain</span><span id="totalKit" hidden><i class="live"></i><b id="totalAngka"></b> kits built</span></div>
+          <div class="meta"><span id="quota">Free to use, no wallet needed.</span><span class="for-all" id="metaRight">For every dev on Robinhood Chain</span><span id="totalKit" hidden><i class="live"></i><b id="totalNum"></b> kits built</span></div>
           <div class="wallet" id="wallet" hidden>
             <button class="pill line" id="walletBtn" type="button">Connect wallet</button>
             <span id="walletInfo"></span>
@@ -115,11 +115,11 @@
     </div>
   </section>
 
-  <section id="hasil" data-page="home" aria-live="polite">
+  <section id="result" data-page="home" aria-live="polite">
     <div class="shell">
       <div class="result-head">
         <div class="avatar"><svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" style="fill:var(--cut)"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg></div>
-        <div><small>{{NAMA_BOT}} says</small><p id="roast"></p></div>
+        <div><small>{{NAME_BOT}} says</small><p id="roast"></p></div>
       </div>
       <div class="kit-actions">
         <button class="pill solid" id="dlAll" type="button">Download all (.zip)</button>
@@ -133,7 +133,7 @@
       <div class="result-grid">
         <div>
           <div class="group">
-            <h3>Name and ticker <span>(tap to copy)</span><button class="redo" type="button" data-bagian="nama" hidden>New names</button></h3>
+            <h3>Name and ticker <span>(tap to copy)</span><button class="redo" type="button" data-part="name" hidden>New names</button></h3>
             <div class="names" id="names"></div>
             <p class="tk-note" id="tkNote" hidden></p>
           </div>
@@ -141,10 +141,10 @@
             <h3>Logo <span id="logoInfo">(PNG, 1024 × 1024 · HQ 2048 for $ORYNX holders)</span></h3>
             <div class="logos" id="logos"></div>
             <div class="styles">
-              <button class="style" data-gaya="maskot" type="button">Mascot</button>
-              <button class="style" data-gaya="pixel" type="button">Pixel</button>
-              <button class="style" data-gaya="minimal" type="button">Minimal</button>
-              <button class="style" data-gaya="bebas" type="button">Try another</button>
+              <button class="style" data-style="mascot" type="button">Mascot</button>
+              <button class="style" data-style="pixel" type="button">Pixel</button>
+              <button class="style" data-style="minimal" type="button">Minimal</button>
+              <button class="style" data-style="classic" type="button">Try another</button>
             </div>
             <p class="pick-hint" id="pickHint" hidden>Tap a logo to use it for your header, intro video and kit page.</p>
           </div>
@@ -160,12 +160,12 @@
           </div>
         </div>
         <div>
-          <div class="group"><h3>Tagline<button class="redo" type="button" data-bagian="tagline" hidden>New tagline</button></h3><div id="tagline"></div></div>
-          <div class="group"><h3 id="fiturLabel">Key features</h3><div id="fitur"></div></div>
-          <div class="group"><h3>Description</h3><div id="deskripsi"></div></div>
+          <div class="group"><h3>Tagline<button class="redo" type="button" data-part="tagline" hidden>New tagline</button></h3><div id="tagline"></div></div>
+          <div class="group"><h3 id="featuresLabel">Key features</h3><div id="features"></div></div>
+          <div class="group"><h3>Description</h3><div id="description"></div></div>
           <div class="group"><h3>X bio</h3><div id="bio"></div></div>
-          <div class="group"><h3>First posts on X<button class="redo" type="button" data-bagian="tweet" hidden>New posts</button></h3><div id="tweets"></div></div>
-          <div class="group"><h3>Telegram welcome message</h3><div id="sambutan"></div></div>
+          <div class="group"><h3>First posts on X<button class="redo" type="button" data-part="tweet" hidden>New posts</button></h3><div id="tweets"></div></div>
+          <div class="group"><h3>Telegram welcome message</h3><div id="welcome"></div></div>
           <div class="group" id="threadGroup"><h3>Launch day thread <span>(5 posts)</span></h3>
             <div id="threadBox"><p class="th-empty">A ready-to-post thread for the moment you go live on pons: the hook, the story, how to buy, your CA and the community call.</p></div>
             <div class="banner-act"><button class="pill solid" id="threadBtn" type="button">Write my launch thread</button><span id="threadMsg"></span></div>
@@ -229,13 +229,13 @@
         </div>
         <div class="ref-r"><h3>Top inviters this week</h3><ol id="refTop"><li class="ref-none">No invites yet this week. Yours could be first.</li></ol></div>
       </div>
-      <div class="kom" id="topWrap" hidden>
+      <div class="com" id="topWrap" hidden>
         <div class="ex-head"><div><h2>Top kits this week</h2><p>The community's favourites. Tap the heart on the kits you'd launch.</p></div></div>
         <div class="gallery" id="topGrid"></div>
       </div>
-      <div class="kom" id="komunitas" hidden>
+      <div class="com" id="community" hidden>
         <div class="ex-head"><div><h2>Community kits</h2><p>Real kits built on Orynx, shared by the people who made them.</p></div></div>
-        <div class="gallery" id="komGrid"></div>
+        <div class="gallery" id="comGrid"></div>
       </div>
       <div class="ex-head">
         <div><h2>Example kits</h2><p>A taste of what Orynx builds, for AI projects and meme coins alike. Tap one to build your own.</p></div>
@@ -310,7 +310,7 @@
       <p class="intro muted">Three steps from a rough idea to everything you need on launch day.</p>
       <ol class="steps">
         <li><span class="n">1</span><h4>Describe your idea</h4><p>Pick AI project or meme coin, then describe it in one sentence.</p></li>
-        <li><span class="n">2</span><h4>Get roasted, then built</h4><p>{{NAMA_BOT}} pokes holes in the pitch, then writes the name, story and posts, and draws two logos.</p></li>
+        <li><span class="n">2</span><h4>Get roasted, then built</h4><p>{{NAME_BOT}} pokes holes in the pitch, then writes the name, story and posts, and draws two logos.</p></li>
         <li><span class="n">3</span><h4>Launch on pons</h4><p>Copy the text, download the logo, and <a href="https://www.ponsfamily.com/launchpad/create" target="_blank" rel="noopener">create your token on pons</a> with everything ready.</p></li>
       </ol>
     </div>
@@ -444,7 +444,8 @@
   <a href="#consult" data-sec="consult"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.1A8 8 0 1 1 20 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg><span>Ask Si Dev</span></a>
 </nav>
 
-<script src="/app.js?v=5"></script>
-<script src="/fitur.js?v=1" defer></script>
+<script src="/upgrade.js?v=1"></script>
+<script src="/app.js?v=6"></script>
+<script src="/features.js?v=2" defer></script>
 </body>
 </html>
