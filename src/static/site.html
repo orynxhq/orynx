@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{NAMA}} {{TICKER_DOLAR}}</title>
+<meta name="description" content="{{TAGLINE}}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{NAMA}} {{TICKER_DOLAR}}">
+<meta property="og:description" content="{{TAGLINE}}">
+<meta property="og:image" content="{{URL}}/logo.png">
+<meta property="og:url" content="{{URL}}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{NAMA}} {{TICKER_DOLAR}}">
+<meta name="twitter:description" content="{{TAGLINE}}">
+<meta name="twitter:image" content="{{URL}}/logo.png">
+<meta name="theme-color" content="{{BG}}">
+<link rel="icon" href="{{PATH}}/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="{{FONT_URL}}" rel="stylesheet">
+<style>
+:root{--bg:{{BG}};--ink:{{INK}};--muted:{{MUTED}};--card:{{CARD}};--line:{{LINE}};--acc:{{ACC}};--acc-ink:{{ACC_INK}};--disp:{{DISP}};--body:{{BODY}};--r:{{RADIUS}};--shadow:{{SHADOW}};--bw:{{BW}}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:400;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{display:block;max-width:100%}
+.wrap{width:min(1080px,100% - 40px);margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--disp);font-weight:700;font-size:18px}
+.brand img{width:40px;height:40px;border-radius:12px;border:var(--bw) solid var(--line)}
+.soc{display:flex;gap:10px}
+.ic{width:44px;height:44px;display:grid;place-items:center;border-radius:999px;border:var(--bw) solid var(--line);background:var(--card);text-decoration:none;box-shadow:var(--shadow)}
+.ic svg{width:18px;height:18px;fill:var(--ink)}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center;padding:56px 0 64px}
+.tk{display:inline-flex;align-items:center;gap:10px;font-family:var(--body);font-weight:700;font-size:15px;letter-spacing:.02em;border:var(--bw) solid var(--line);background:var(--card);padding:8px 16px;border-radius:999px;box-shadow:var(--shadow)}
+.tk i{width:9px;height:9px;border-radius:50%;background:var(--acc)}
+h1{font-family:var(--disp);font-weight:{{H1_WEIGHT}};font-size:{{H1_SIZE}};line-height:.98;letter-spacing:{{H1_TRACK}};margin:22px 0 18px;overflow-wrap:break-word;hyphens:manual}
+.tag{font-size:clamp(20px,2.6vw,26px);line-height:1.4;color:var(--ink);margin:0 0 30px;max-width:30ch;opacity:.86}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;border-radius:999px;font-family:var(--body);font-weight:700;font-size:17px;text-decoration:none;border:var(--bw) solid var(--line);background:var(--card);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.main{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.btn.soon{opacity:.6;cursor:default}
+.btn:focus-visible,.ic:focus-visible,.copy:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+.art{position:relative;aspect-ratio:1;max-width:460px;justify-self:center;width:100%}
+.art .halo{position:absolute;inset:-12%;border-radius:50%;background:radial-gradient(circle,var(--acc) 0,transparent 62%);opacity:{{HALO}};filter:blur(10px)}
+.art img{position:relative;width:100%;height:100%;object-fit:cover;border-radius:calc(var(--r) * 2);border:var(--bw) solid var(--line);box-shadow:var(--shadow)}
+.ca{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px;padding:14px 14px 14px 22px;border-radius:var(--r);border:var(--bw) solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+.ca small{font-weight:700;color:var(--muted);white-space:nowrap}
+.ca code{font:600 15px ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
+.copy{min-height:44px;padding:0 20px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font-family:var(--body);font-weight:700;font-size:15px;cursor:pointer}
+.bond{margin-top:16px;padding:18px 22px;border-radius:var(--r);border:var(--bw) solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+.bond-t{display:flex;justify-content:space-between;align-items:baseline;font-weight:700}
+.bond-t b{font-family:var(--disp);font-weight:700;font-size:26px}
+.bar{height:12px;border-radius:12px;background:var(--line);margin:12px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:12px;background:var(--acc);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.bond p{margin:0;font-size:14px;color:var(--muted)}
+section{padding:72px 0}
+h2{font-family:var(--disp);font-weight:{{H2_WEIGHT}};font-size:clamp(30px,3.6vw,46px);line-height:1.08;overflow-wrap:break-word;letter-spacing:{{H1_TRACK}};margin:0 0 22px}
+.about{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:48px}
+.about p{font-size:clamp(18px,2vw,21px);margin:0;max-width:62ch}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{padding:28px;border-radius:var(--r);border:var(--bw) solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+.card .k{font-family:var(--disp);font-weight:700;font-size:44px;line-height:1;color:var(--acc);display:block;margin-bottom:18px}
+.card p{margin:0;font-size:18px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;counter-reset:s}
+.step{padding:26px;border-radius:var(--r);border:var(--bw) dashed var(--line)}
+.step b{display:block;font-family:var(--disp);font-weight:700;font-size:20px;margin-bottom:8px}
+.step p{margin:0;color:var(--muted);font-size:16px}
+footer{padding:48px 0 64px;border-top:var(--bw) solid var(--line);margin-top:24px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;font-size:14px;color:var(--muted)}
+footer a{font-weight:700;color:var(--ink)}
+.made{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.made svg{width:18px;height:18px}
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;padding:28px 0 40px;gap:32px}
+  .art{order:-1;max-width:300px}
+  .about{grid-template-columns:1fr;gap:12px}
+  .cards,.steps{grid-template-columns:1fr}
+  .ca{grid-template-columns:1fr auto}.ca small{grid-column:1/-1}
+  section{padding:48px 0}
+  .btn{flex:1 1 auto}
+}
+@media (prefers-reduced-motion:reduce){.btn,.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top"><img src="{{PATH}}/logo.png" alt="">{{NAMA}}</a>
+    <nav class="soc" aria-label="Social links">{{SOC}}</nav>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <span class="tk"><i></i>{{TICKER_DOLAR_ATAU}} · {{LABEL_CHAIN}}</span>
+        <h1>{{NAMA}}</h1>
+        <p class="tag">{{TAGLINE}}</p>
+        <div class="cta">{{CTA}}</div>
+      </div>
+      <div class="art"><div class="halo"></div><img src="{{PATH}}/logo.png" alt="{{NAMA}} logo"></div>
+    </div>
+
+    {{CA_BLOK}}
+
+    <section class="about" aria-labelledby="about-h">
+      <h2 id="about-h">About {{NAMA}}</h2>
+      <p>{{DESKRIPSI}}</p>
+    </section>
+
+    <section aria-labelledby="pts-h">
+      <h2 id="pts-h">{{JUDUL_FITUR}}</h2>
+      <div class="cards">{{FITUR}}</div>
+    </section>
+
+    <section aria-labelledby="buy-h">
+      <h2 id="buy-h">How to get {{TICKER_DOLAR_ATAU}}</h2>
+      <div class="steps">{{LANGKAH}}</div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Not financial advice. Always check the contract address before you buy.</span>
+    <a class="made" href="https://orynxai.xyz/?ref=minisite" target="_blank" rel="noopener"><svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="currentColor" stroke-width="54"/><circle cx="362.1" cy="149.9" r="34" fill="currentColor"/></svg>Made with Orynx</a>
+  </footer>
+</div>
+<script>
+(function(){
+  var b=document.getElementById('cpy');
+  if(b){b.onclick=function(){var t=document.getElementById('ca').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1400)}).catch(function(){})}}
+  var bd=document.getElementById('bond');
+  if(bd){fetch(bd.dataset.src).then(function(r){return r.json()}).then(function(h){if(!h.ada)return;bd.hidden=false;var p=Math.max(0,Math.min(100,h.persen));document.getElementById('bp').textContent=p.toFixed(1)+'%';
+    document.getElementById('bn').textContent=h.lulus?'Graduated to a locked Uniswap v4 pool':(h.saat_ini.toFixed(3)+' of '+h.ambang.toFixed(2)+' ETH on the pons curve');requestAnimationFrame(function(){document.getElementById('bf').style.width=Math.max(2,p)+'%'})}).catch(function(){})}
+})();
+</script>
+</body>
+</html>

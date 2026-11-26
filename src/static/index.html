@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orynx · AI launch kits for Robinhood Chain</title>
+<meta name="description" content="Describe your AI project or meme coin and get a launch-ready kit in seconds: name, ticker, tagline, logo, and first posts for X and Telegram.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Orynx">
+<meta property="og:url" content="https://orynxai.xyz/">
+<meta property="og:title" content="Orynx · AI launch kits">
+<meta property="og:description" content="Drop one idea, get a launch-ready kit: name, ticker, logo, tagline and first posts. Built for Robinhood Chain.">
+<meta property="og:image" content="https://orynxai.xyz/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Orynx: your token, launch-ready in thirty seconds">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@orynxhq">
+<meta name="twitter:title" content="Orynx · AI launch kits">
+<meta name="twitter:description" content="Your token, launch-ready in thirty seconds.">
+<meta name="twitter:image" content="https://orynxai.xyz/og.png">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css?v=5">
+</head>
+<body>
+
+<header class="nav">
+  <div class="shell">
+    <a class="brand" href="#home" aria-label="Orynx home">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" style="fill:var(--cut)"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg>
+      <span>ORYNX</span>
+    </a>
+    <nav aria-label="Main">
+      <a href="#examples">Examples</a>
+      <a href="#how">How it works</a>
+      <a href="#kit">What you get</a>
+      <a href="#consult">Ask Si Dev</a>
+      <a href="#token">$ORYNX</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="pill solid" href="#build">Build a kit</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" data-page="home">
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <svg class="orbit" viewBox="0 0 1000 1000" aria-hidden="true">
+      <circle class="ring" cx="500" cy="500" r="440"/>
+      <circle class="ring inner" cx="500" cy="500" r="300"/>
+      <defs>
+        <linearGradient id="shineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".72" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".92" stop-color="#fff" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g class="turn-c"><circle class="dash" cx="500" cy="500" r="370"/></g>
+      <g class="turn-a"><circle class="moon" cx="500" cy="60" r="7"/></g>
+      <g class="turn-b"><circle class="moon" cx="500" cy="200" r="5" opacity=".7"/><circle class="moon" cx="500" cy="800" r="3" opacity=".5"/></g>
+      <g class="shine"><circle cx="500" cy="500" r="440" stroke="url(#shineGrad)"/><circle class="in" cx="500" cy="500" r="300" stroke="url(#shineGrad)" opacity=".6"/></g>
+      <g class="sat-move">
+        <circle class="sat-halo" r="30"><animateMotion dur="2.4s" begin="0.3s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".2 .7 .2 1" path="M 280 881.1 A 440 440 0 0 1 139.6 247.6"/></circle>
+        <circle class="sat" r="14"><animateMotion dur="2.4s" begin="0.3s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".2 .7 .2 1" path="M 280 881.1 A 440 440 0 0 1 139.6 247.6"/></circle>
+      </g>
+    </svg>
+
+    <div class="shell">
+      <div>
+        <h1 class="rise d1">Your token, launch‑ready in thirty seconds.</h1>
+        <p class="lede rise d2">AI project or meme coin, drop the idea. {{NAMA_BOT}}, our resident AI dev, roasts it, then builds the kit: <b>name, ticker, logo, tagline, story and your first posts</b>, ready for <a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">pons</a> on Robinhood Chain.</p>
+
+        <div class="tool rise d3" id="build">
+          <div class="modes" role="group" aria-label="Token type">
+            <button class="mode" type="button" data-mode="ai" aria-pressed="true">AI project</button>
+            <button class="mode" type="button" data-mode="meme" aria-pressed="false">Meme coin</button>
+          </div>
+          <form id="form" autocomplete="off">
+            <label for="ide" id="ideLabel">What does your AI project do?</label>
+            <div class="field">
+              <input id="ide" maxlength="200" placeholder="An AI agent that tracks whale wallets">
+              <button id="kirim" class="pill solid" type="submit">Build my kit</button>
+              <button class="own-toggle" id="ownToggle" type="button" aria-expanded="false" aria-controls="own">Have a name in mind?</button>
+              <div class="own" id="own" hidden>
+                <input id="namaSendiri" maxlength="40" placeholder="Name (optional)" aria-label="Token name (optional)">
+                <input id="tickerSendiri" maxlength="8" placeholder="Ticker (optional)" aria-label="Ticker (optional)">
+              </div>
+            </div>
+          </form>
+          <div class="ideas" id="ideas" aria-label="Example ideas"></div>
+          <a class="ask-link" href="#consult">Not sure yet? Ask Si Dev before you launch</a>
+          <div class="status" id="status" role="status"><span class="spin"></span><span id="statusText"></span></div>
+          <div class="error" id="error" role="alert"></div>
+          <div class="meta"><span id="quota">Free to use, no wallet needed.</span><span class="for-all" id="metaRight">For every dev on Robinhood Chain</span><span id="totalKit" hidden><i class="live"></i><b id="totalAngka"></b> kits built</span></div>
+          <div class="wallet" id="wallet" hidden>
+            <button class="pill line" id="walletBtn" type="button">Connect wallet</button>
+            <span id="walletInfo"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-side rise d4">
+        <div class="stat"><b>~30 sec</b><span>from idea to a full kit</span></div>
+        <div class="stat"><b>7 assets</b><span>names, logos, copy and posts</span></div>
+        <div class="stat"><b>2048 px</b><span>HQ logos for $ORYNX holders</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="hasil" data-page="home" aria-live="polite">
+    <div class="shell">
+      <div class="result-head">
+        <div class="avatar"><svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" style="fill:var(--cut)"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg></div>
+        <div><small>{{NAMA_BOT}} says</small><p id="roast"></p></div>
+      </div>
+      <div class="kit-actions">
+        <button class="pill solid" id="dlAll" type="button">Download all (.zip)</button>
+        <button class="pill line" id="copyAll" type="button">Copy all text</button>
+        <button class="pill line" id="shareKit" type="button" hidden>Share to community</button>
+        <span class="restored" id="restored" hidden>Your last kit, saved on this device.<button type="button" id="clearKit">Clear</button></span>
+      </div>
+      <div class="share-row" id="shareRow" hidden><span>Your kit page:</span><code id="shareUrl"></code><button class="pill line" id="shareCopy" type="button">Copy link</button><a class="pill solid" id="shareX" href="#" target="_blank" rel="noopener">Post on X</a></div>
+      <p class="redo-msg" id="redoMsg" hidden></p>
+
+      <div class="result-grid">
+        <div>
+          <div class="group">
+            <h3>Name and ticker <span>(tap to copy)</span><button class="redo" type="button" data-bagian="nama" hidden>New names</button></h3>
+            <div class="names" id="names"></div>
+            <p class="tk-note" id="tkNote" hidden></p>
+          </div>
+          <div class="group">
+            <h3>Logo <span id="logoInfo">(PNG, 1024 × 1024 · HQ 2048 for $ORYNX holders)</span></h3>
+            <div class="logos" id="logos"></div>
+            <div class="styles">
+              <button class="style" data-gaya="maskot" type="button">Mascot</button>
+              <button class="style" data-gaya="pixel" type="button">Pixel</button>
+              <button class="style" data-gaya="minimal" type="button">Minimal</button>
+              <button class="style" data-gaya="bebas" type="button">Try another</button>
+            </div>
+            <p class="pick-hint" id="pickHint" hidden>Tap a logo to use it for your header, intro video and kit page.</p>
+          </div>
+          <div class="group" id="bannerGroup" hidden>
+            <h3>X header <span>(1500 &times; 500, for your profile)</span></h3>
+            <div class="banner"><img id="bannerImg" alt="X header preview"></div>
+            <div class="banner-act"><a class="pill line" id="bannerDl" href="#" download="x_header.png">Download header</a><span>Also inside the .zip</span></div>
+          </div>
+          <div class="group" id="videoGroup" hidden>
+            <h3>Intro video <span id="vidInfo">(15 sec with original music)</span></h3>
+            <div class="vid" id="vidBox"><div class="vid-empty" id="vidEmpty">Your logo, name and story, animated with original music. Ready to post on X.</div></div>
+            <div class="banner-act"><button class="pill solid" id="vidMake" type="button">Make intro video</button><a class="pill line" id="vidDl" href="#" download hidden>Download video</a><span id="vidMsg"></span></div>
+          </div>
+        </div>
+        <div>
+          <div class="group"><h3>Tagline<button class="redo" type="button" data-bagian="tagline" hidden>New tagline</button></h3><div id="tagline"></div></div>
+          <div class="group"><h3 id="fiturLabel">Key features</h3><div id="fitur"></div></div>
+          <div class="group"><h3>Description</h3><div id="deskripsi"></div></div>
+          <div class="group"><h3>X bio</h3><div id="bio"></div></div>
+          <div class="group"><h3>First posts on X<button class="redo" type="button" data-bagian="tweet" hidden>New posts</button></h3><div id="tweets"></div></div>
+          <div class="group"><h3>Telegram welcome message</h3><div id="sambutan"></div></div>
+          <div class="group" id="threadGroup"><h3>Launch day thread <span>(5 posts)</span></h3>
+            <div id="threadBox"><p class="th-empty">A ready-to-post thread for the moment you go live on pons: the hook, the story, how to buy, your CA and the community call.</p></div>
+            <div class="banner-act"><button class="pill solid" id="threadBtn" type="button">Write my launch thread</button><span id="threadMsg"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="check" id="checkBox">
+        <div class="check-head"><h3>Launch checklist</h3><span id="checkCount" style="font-size:14px;color:var(--graphite)">0 of 6 done</span></div>
+        <div class="check-bar"><i id="checkBar"></i></div>
+        <ul id="checkList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="mykits" id="mykits" data-page="home" hidden>
+    <div class="shell">
+      <div class="ex-head"><div><h2>My kits</h2><p>Every kit you build is saved on this device. Tap one to open it again.</p></div></div>
+      <div class="mk-row" id="mkRow"></div>
+    </div>
+  </section>
+
+  <section class="ca-sec" id="ca" data-page="home">
+    <div class="shell">
+      <div class="ca-card">
+        <div>
+          <span class="ca-live"><i></i>$ORYNX is live on pons</span>
+          <h2>Hold 1M $ORYNX to unlock</h2>
+          <p>Connect your wallet in the builder above to unlock the full kit.</p>
+          <div class="ca-perks"><span>HQ 2048 px logos</span><span>4 logo options at once</span><span>Every logo style</span><span>10 kits a day</span></div>
+        </div>
+        <div class="ca-box">
+          <small>Contract address</small>
+          <div class="ca-row"><code id="caHome"></code><button type="button" id="caHomeCopy">Copy</button></div>
+          <div class="ca-acts"><a class="pill solid" id="caBuy" href="https://ponsfamily.com/launchpad" target="_blank" rel="noopener">Buy on pons</a><a class="pill line" id="caScan" href="https://robin.etherscan.io" target="_blank" rel="noopener">View on explorer</a></div>
+          <p class="ca-burn" id="caBurn" hidden></p>
+          <p class="ca-warn">Only trust this address and posts from <a href="https://x.com/orynxhq" target="_blank" rel="noopener">@orynxhq</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="fresh" id="fresh" data-page="home">
+    <div class="shell">
+      <div class="ex-head">
+        <div><span class="ca-live"><i></i>Live from the community</span><h2>Fresh kits from builders</h2><p>Real kits made on Orynx and shared by the people who built them. Yours could be next.</p></div>
+        <a class="pill line" href="#examples">See all</a>
+      </div>
+      <div class="gallery" id="freshGrid"></div>
+    </div>
+  </section>
+
+  <section class="band examples" id="examples" data-page="examples">
+    <div class="shell">
+      <div class="ref" id="refBox">
+        <div class="ref-l">
+          <span class="ca-live"><i></i>Invite builders</span>
+          <h2>Bring builders. Climb the board.</h2>
+          <p>Get your own Orynx link. Every new builder who makes a kit through it counts for you on the weekly board.</p>
+          <form class="ref-form" id="refForm" autocomplete="off"><input id="refInput" maxlength="20" placeholder="Your X handle, e.g. orynxhq" aria-label="Your X handle"><button class="pill solid" type="submit">Get my link</button></form>
+          <div class="ref-mine" id="refMine" hidden><code id="refLink"></code><button class="pill line" id="refCopy" type="button">Copy</button><a class="pill line" id="refX" target="_blank" rel="noopener" href="#">Post on X</a><span id="refStat"></span></div>
+        </div>
+        <div class="ref-r"><h3>Top inviters this week</h3><ol id="refTop"><li class="ref-none">No invites yet this week. Yours could be first.</li></ol></div>
+      </div>
+      <div class="kom" id="topWrap" hidden>
+        <div class="ex-head"><div><h2>Top kits this week</h2><p>The community's favourites. Tap the heart on the kits you'd launch.</p></div></div>
+        <div class="gallery" id="topGrid"></div>
+      </div>
+      <div class="kom" id="komunitas" hidden>
+        <div class="ex-head"><div><h2>Community kits</h2><p>Real kits built on Orynx, shared by the people who made them.</p></div></div>
+        <div class="gallery" id="komGrid"></div>
+      </div>
+      <div class="ex-head">
+        <div><h2>Example kits</h2><p>A taste of what Orynx builds, for AI projects and meme coins alike. Tap one to build your own.</p></div>
+      </div>
+      <div class="gallery" id="gallery">
+        <article class="ex">
+          <span class="ex-type">AI project</span>
+          <div class="ex-top"><svg class="ex-logo" viewBox="0 0 512 512" role="img" aria-label="WhaleSight logo"><rect width="512" height="512" fill="#000"/><circle cx="256" cy="256" r="180" fill="none" stroke="#fff" stroke-width="14" opacity=".25"/><circle cx="256" cy="256" r="128" fill="none" stroke="#fff" stroke-width="14" opacity=".55"/><path d="M256 360 C252 320 252 290 256 262 C232 262 188 244 170 200 C214 210 240 224 256 244 C272 224 298 210 342 200 C324 244 280 262 256 262" fill="#fff"/><rect x="244" y="258" width="24" height="104" rx="12" fill="#fff"/></svg><div><b>WhaleSight</b><code>$WSGT</code></div></div>
+          <p class="ex-tag">Your AI lookout for every whale move.</p>
+          <p class="ex-post">gm. the whales never sleep. neither does WhaleSight.</p>
+          <button class="ex-cta" type="button" data-mode="ai">Build one like this</button>
+        </article>
+        <article class="ex">
+          <span class="ex-type meme">Meme coin</span>
+          <div class="ex-top"><svg class="ex-logo" viewBox="0 0 512 512" role="img" aria-label="Night Frog logo"><rect width="512" height="512" fill="#1b1f4b"/><circle cx="392" cy="118" r="44" fill="#ffe27a"/><circle cx="410" cy="104" r="40" fill="#1b1f4b"/><ellipse cx="256" cy="330" rx="170" ry="120" fill="#5fcf6b" stroke="#111" stroke-width="12"/><circle cx="186" cy="214" r="58" fill="#5fcf6b" stroke="#111" stroke-width="12"/><circle cx="326" cy="214" r="58" fill="#5fcf6b" stroke="#111" stroke-width="12"/><circle cx="186" cy="214" r="26" fill="#fff"/><circle cx="326" cy="214" r="26" fill="#fff"/><rect x="168" y="208" width="36" height="12" rx="6" fill="#111"/><rect x="308" y="208" width="36" height="12" rx="6" fill="#111"/><path d="M190 350 Q256 390 322 350" fill="none" stroke="#111" stroke-width="12" stroke-linecap="round"/></svg><div><b>Night Frog</b><code>$NFROG</code></div></div>
+          <p class="ex-tag">Only trades at 3am. Never misses.</p>
+          <p class="ex-post">the frog is awake. are you?</p>
+          <button class="ex-cta" type="button" data-mode="meme">Build one like this</button>
+        </article>
+        <article class="ex">
+          <span class="ex-type">AI project</span>
+          <div class="ex-top"><svg class="ex-logo" viewBox="0 0 512 512" role="img" aria-label="ClearCode logo"><rect width="512" height="512" fill="#fff"/><g fill="none" stroke="#000" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"><circle cx="226" cy="226" r="122"/><line x1="314" y1="314" x2="410" y2="410"/><polyline points="196,186 156,226 196,266"/><polyline points="256,186 296,226 256,266"/></g></svg><div><b>ClearCode</b><code>$CLEAR</code></div></div>
+          <p class="ex-tag">Read any token contract before you ape.</p>
+          <p class="ex-post">paste a contract. see what it can really do.</p>
+          <button class="ex-cta" type="button" data-mode="ai">Build one like this</button>
+        </article>
+        <article class="ex">
+          <span class="ex-type meme">Meme coin</span>
+          <div class="ex-top"><svg class="ex-logo" viewBox="0 0 512 512" role="img" aria-label="CEO Cat logo"><rect width="512" height="512" fill="#ffb347"/><path d="M140 210 L160 96 L236 170 Z M372 210 L352 96 L276 170 Z" fill="#ff8c1a" stroke="#111" stroke-width="12" stroke-linejoin="round"/><circle cx="256" cy="250" r="128" fill="#ff8c1a" stroke="#111" stroke-width="12"/><circle cx="210" cy="236" r="16" fill="#111"/><circle cx="302" cy="236" r="16" fill="#111"/><path d="M236 280 Q256 296 276 280" fill="none" stroke="#111" stroke-width="10" stroke-linecap="round"/><path d="M226 372 L256 352 L286 372 L272 470 L256 486 L240 470 Z" fill="#c62828" stroke="#111" stroke-width="10" stroke-linejoin="round"/></svg><div><b>CEO Cat</b><code>$CEOCAT</code></div></div>
+          <p class="ex-tag">Never sells. Only naps.</p>
+          <p class="ex-post">board meeting cancelled. the CEO is napping.</p>
+          <button class="ex-cta" type="button" data-mode="meme">Build one like this</button>
+        </article>
+        <article class="ex">
+          <span class="ex-type">AI project</span>
+          <div class="ex-top"><svg class="ex-logo" viewBox="0 0 512 512" role="img" aria-label="Tickr Pilot logo"><rect width="512" height="512" fill="#000"/><circle cx="256" cy="256" r="176" fill="none" stroke="#fff" stroke-width="22"/><polyline points="150,320 214,262 262,292 356,188" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><polyline points="306,186 358,186 358,238" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Tickr Pilot</b><code>$TPLT</code></div></div>
+          <p class="ex-tag">Your copilot for trading stock tokens.</p>
+          <p class="ex-post">charts at 2am? let the copilot take a look.</p>
+          <button class="ex-cta" type="button" data-mode="ai">Build one like this</button>
+        </article>
+        <article class="ex">
+          <span class="ex-type meme">Meme coin</span>
+          <div class="ex-top"><svg class="ex-logo" viewBox="0 0 512 512" role="img" aria-label="Cluck logo"><rect width="512" height="512" fill="#7ec8f0"/><ellipse cx="256" cy="300" rx="150" ry="140" fill="#ffe14d" stroke="#111" stroke-width="12"/><path d="M226 150 Q236 110 256 140 Q270 100 286 146 Q306 118 300 166" fill="#e53935" stroke="#111" stroke-width="10" stroke-linejoin="round"/><circle cx="214" cy="262" r="18" fill="#111"/><circle cx="298" cy="262" r="18" fill="#111"/><path d="M236 298 L276 298 L256 330 Z" fill="#ff9800" stroke="#111" stroke-width="8" stroke-linejoin="round"/><path d="M370 210 Q384 236 370 250 Q356 236 370 210Z" fill="#fff" stroke="#111" stroke-width="6"/></svg><div><b>Cluck</b><code>$CLUCK</code></div></div>
+          <p class="ex-tag">The chicken scared of liquidation.</p>
+          <p class="ex-post">cluck checked the chart and fainted again.</p>
+          <button class="ex-cta" type="button" data-mode="meme">Build one like this</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band hq" id="hq" data-page="home">
+    <div class="shell">
+      <div class="hq-card">
+        <div>
+          <h2>Unlock HQ logos with $ORYNX</h2>
+          <p>Hold 1,000,000 $ORYNX to get logos in 2048 px, every logo style, and ten launch kits a day.</p>
+          <div class="hq-perks"><span>2048 px HQ export</span><span>4 logo options at once</span><span>Mascot, Pixel and Minimal styles</span><span>10 kits a day</span></div>
+          <a class="pill solid" href="#token">See what holders get</a>
+        </div>
+        <div class="hq-vis" aria-hidden="true">
+          <div class="hq-tile lo"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#000"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg><b>1024 px</b></div>
+          <div class="hq-tile hi"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#000"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg><b>HQ 2048 px</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="light band" id="how" data-page="home">
+    <div class="shell">
+      <h2>How it works</h2>
+      <p class="intro muted">Three steps from a rough idea to everything you need on launch day.</p>
+      <ol class="steps">
+        <li><span class="n">1</span><h4>Describe your idea</h4><p>Pick AI project or meme coin, then describe it in one sentence.</p></li>
+        <li><span class="n">2</span><h4>Get roasted, then built</h4><p>{{NAMA_BOT}} pokes holes in the pitch, then writes the name, story and posts, and draws two logos.</p></li>
+        <li><span class="n">3</span><h4>Launch on pons</h4><p>Copy the text, download the logo, and <a href="https://www.ponsfamily.com/launchpad/create" target="_blank" rel="noopener">create your token on pons</a> with everything ready.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="kit" data-page="home">
+    <div class="shell kit">
+      <div>
+        <h2>Everything for launch day, in one kit</h2>
+        <p style="color:var(--graphite);margin:0">AI projects get a clear product story. Meme coins get a mascot, lore and posts made to spread. Either way you launch with everything ready.</p>
+      </div>
+      <ul class="kitlist">
+        <li><b>Names and tickers</b><span>Three brandable options, each with a 3 to 6 letter ticker.</span></li>
+        <li><b>Logos</b><span>Two original logos: clean black-and-white marks for AI projects, bold mascots for meme coins.</span></li>
+        <li><b>Tagline</b><span>One line people remember.</span></li>
+        <li><b>Features or lore</b><span>Three product features for AI projects, or three lore points for meme coins.</span></li>
+        <li><b>Description</b><span>The story of your token, ready for your pons page.</span></li>
+        <li><b>X bio and first posts</b><span>A bio under 160 characters and three posts you can share in one tap.</span></li>
+        <li><b>Telegram welcome</b><span>A short message to pin when your community starts arriving.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="light band" id="token" data-page="token">
+    <div class="shell token">
+      <div>
+        <p class="ticker">$ORYNX</p>
+        <p class="muted" style="margin:0;max-width:46ch">The utility token powering Orynx on Robinhood Chain. Holders unlock more of the tool, first.</p>
+      </div>
+      <div>
+        <h2>What holders get</h2>
+        <ul class="perks">
+          <li>Hold 1,000,000 $ORYNX for 10 launch kits a day</li>
+          <li>HQ logos in 2048 px</li>
+          <li>Every logo style: mascot, pixel and minimal</li>
+          <li>4 logo options every round instead of 2</li>
+          <li>Early access to new tools as they ship</li>
+        </ul>
+        <div class="notice" id="tokenBox">
+          <b>Launching soon</b>
+          <p>The official contract address will be announced on <a href="https://x.com/orynxhq" target="_blank" rel="noopener">@orynxhq</a> on X.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band burn" id="burn" data-page="token" hidden>
+    <div class="shell">
+      <div class="burn-card">
+        <div>
+          <span class="ca-live burn-live"><i></i>Burn tracker</span>
+          <h2>$ORYNX burned so far</h2>
+          <p class="burn-num" id="burnNum">0</p>
+          <p class="burn-pct" id="burnPct"></p>
+          <div class="burn-bar"><i id="burnBar"></i></div>
+          <p class="burn-note">Read live from the dead address on Robinhood Chain. <a id="burnDead" href="#" target="_blank" rel="noopener">View on explorer</a></p>
+        </div>
+        <div><h3>Burn history</h3><ul class="burn-list" id="burnList"></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band consult" id="consult" data-page="consult">
+    <div class="shell">
+      <div class="cs-head">
+        <div class="cs-av"><svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" style="fill:var(--cut)"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg></div>
+        <div><h2>Ask Si Dev before you launch</h2><p>Not sure your idea is ready? Talk it through first: the pitch, the name, the launch plan on pons. Free to ask, no wallet needed.</p></div>
+      </div>
+      <div class="chat">
+        <div class="log" id="log" aria-live="polite">
+          <div class="msg bot"><small>Si Dev</small><p>gm. Tell me what you're about to launch and I'll tell you what's missing. Be honest. I will be.</p></div>
+        </div>
+        <div class="starters" id="starters">
+          <button type="button">Is my token idea strong enough?</button>
+          <button type="button">What should I prepare before launching on pons?</button>
+          <button type="button">Help me pick a name and ticker</button>
+          <button type="button">How do I grow a community from zero?</button>
+        </div>
+        <form class="chat-in" id="chatForm" autocomplete="off">
+          <textarea id="chatText" rows="1" maxlength="1000" placeholder="Ask about your idea, name or launch plan" aria-label="Message Si Dev"></textarea>
+          <button class="pill solid" id="chatSend" type="submit">Send</button>
+        </form>
+        <div class="chat-meta"><span id="chatQuota">Free questions every day</span><button type="button" class="linkbtn" id="chatToKit" hidden>Ready? Build the kit with this idea</button></div>
+      </div>
+      <p class="cs-note">Si Dev gives launch advice, not financial advice. He won't predict prices or promise returns.</p>
+    </div>
+  </section>
+
+  <section class="band" id="faq" data-page="faq">
+    <div class="shell faq">
+      <h2>Questions</h2>
+      <details><summary>Is Orynx free to use?</summary><p>Yes. Everyone gets free launch kits every day. Once $ORYNX launches, holding 1,000,000 $ORYNX unlocks 10 kits a day and every logo style.</p></details>
+      <details><summary>Can I make a meme coin with it?</summary><p>Yes. Switch to Meme coin and Orynx builds a mascot, lore, name and posts made to spread. AI projects get a clean product kit instead.</p></details>
+      <details><summary>Do I own what Orynx makes?</summary><p>Yes, use the names, logos and text however you like. Check that a name or ticker isn't already taken on pons and X before you launch.</p></details>
+      <details><summary>Which chain does it support?</summary><p>Orynx is built for Robinhood Chain, and kits are ready to use on <a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">pons</a>.</p></details>
+      <details><summary>What can't it make?</summary><p>Orynx only makes original tokens. It skips ideas that copy existing brands, famous characters or real people, so your launch is yours alone.</p></details>
+      <details><summary>How do I get more kits per day?</summary><p>Hold 1,000,000 $ORYNX once it launches, then tap Connect wallet. Signing in is free and never moves your funds.</p></details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="foot-cta">
+      <div><h2>Ready when your idea is.</h2><p>One sentence in. A launch-ready kit out.</p></div>
+      <a class="pill solid" href="#build">Build a kit</a>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#home" aria-label="Orynx home">
+          <svg viewBox="0 0 512 512" aria-hidden="true" style="--cut:var(--ink)"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" style="fill:var(--cut)"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg>
+          <span>ORYNX</span>
+        </a>
+        <p>Launch kits for AI projects and meme coins on Robinhood Chain.</p>
+      </div>
+      <nav class="foot-col" aria-label="Product"><h4>Product</h4><a href="#build">Build a kit</a><a href="#consult">Ask Si Dev</a><a href="#examples">Examples</a><a href="#how">How it works</a><a href="#kit">What you get</a></nav>
+      <nav class="foot-col" aria-label="Token"><h4>$ORYNX</h4><a href="#token">Holder perks</a><a href="#hq">HQ logos</a><a href="#faq">FAQ</a></nav>
+      <nav class="foot-col" aria-label="Community"><h4>Community</h4><a href="https://x.com/orynxhq" target="_blank" rel="noopener">X @orynxhq</a><a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">Launch on pons</a></nav>
+    </div>
+    <div class="foot-big" aria-hidden="true">ORYNX</div>
+  </div>
+  <div class="shell"><div class="foot-bottom"><span>© 2026 Orynx</span><span>Built for pons on Robinhood Chain</span></div></div>
+  <div class="socials" id="socials"></div>
+</footer>
+
+<nav class="tabbar" aria-label="Quick navigation">
+  <a href="#home" data-sec="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+  <a href="#examples" data-sec="examples"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Examples</span></a>
+  <a href="#build" class="go" data-sec="build"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 13.9 9l5.6 1.9-5.6 1.9L12 18.5l-1.9-5.7L4.5 10.9 10.1 9z"/><path d="M19 16v4M17 18h4"/></svg><span>Build a kit</span></a>
+  <a href="#token" data-sec="token"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="17.3" cy="6.7" r="2.2" fill="currentColor"/></svg><span>$ORYNX</span></a>
+  <a href="#consult" data-sec="consult"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.1A8 8 0 1 1 20 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg><span>Ask Si Dev</span></a>
+</nav>
+
+<script src="/app.js?v=5"></script>
+<script src="/fitur.js?v=1" defer></script>
+</body>
+</html>
