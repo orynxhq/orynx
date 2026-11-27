@@ -250,7 +250,7 @@ Canvas and format:
 
 {RULES_DESIGN}
 
-- Keep the SVG compact: every element must earn its place.
+- Keep the SVG compact: under 6,000 characters in total, round coordinates to whole numbers, every element must earn its place.
 - If the requested style is pixel-art, ignore the shape rules above and use only <rect> blocks
   snapped to a 32 px grid (16 x 16 cells), still centred with an empty margin.
 - Never copy an existing brand, logo or famous character.
