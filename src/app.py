@@ -276,25 +276,27 @@ DESIGN_LOGO = {
 Quality reference (the Orynx logo, do not copy it): a thick white ring, and a small white satellite dot
 that sits on the ring with a background-coloured halo cutting a gap into the ring.
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" fill="#0a0a0a"/><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#0a0a0a"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg>""",
-    "meme": """What makes the mascot great (follow strictly). It must look like a finished, premium sticker, never like basic clip art:
-- ONE character, front or three-quarter view, with a big head (about 55 to 60% of the mark) and the
-  shoulders or a small body visible.
-- Dress it for the story: one costume piece that tells the joke (a hood, cape, hat, helmet, scarf, mask,
-  jacket...) plus ONE signature prop (a coin, flag, lantern, bag, tool...).
-- Cel-shaded sticker technique, light from the top-left. For each main shape draw, in this order:
+    "meme": """What makes the mascot great (follow strictly). Think of the mascots of top meme coins: an iconic
+character with attitude that works as a profile picture, a token icon and a sticker. It must feel like crypto
+internet culture made by a pro illustrator, NEVER like a children's book, a kids' app or a cute nursery sticker:
+- ONE character, head and shoulders (bust portrait), front or three-quarter view, filling most of the canvas.
+  Real proportions with a slightly oversized head, not a baby or a toddler.
+- Attitude first: one clear grown-up meme expression that fits the joke (smug, deadpan, unbothered, side-eye,
+  confident smirk, chaotic grin, heavy-lidded stare). Eyes are normal size or narrowed with heavy eyelids,
+  never huge round baby eyes. No blush cheeks, no tears or sweat drops, no tongue unless it is the joke.
+- ONE accessory that sells the joke and the crypto vibe (a beanie, hoodie, cap, sunglasses, chain, headset,
+  bandana...). Props are optional; if used, only one and kept small.
+- Bold sticker technique, light from the top-left. For each main shape draw, in this order:
   1) the base fill with no stroke, 2) ONE darker shade shape of the same hue on the lower-right side,
-  kept inside the base shape, 3) one or two small light highlight shapes, 4) the same outline path again
-  with fill="none" and stroke="#111111" (stroke-width 10 to 14, stroke-linejoin="round").
-- Eyes with personality (white, dark pupil, small white highlight; or a squint, a sly look, a mask) and
-  one clear expression that fits the joke.
-- Simple scene behind it: the base background colour, one big circle or sun in a lighter tone of that
-  colour behind the character, and 2 or 3 small accents (sparkles, stars, coins, bubbles) around it.
-  Strong contrast between character and background.
-- Palette: 5 or 6 harmonious, saturated tones in total (base colours plus their shades), plus the outline.
-- Draw back to front. The character spans 70 to 80% of the canvas; nothing touches the edges.
-- Clean, confident curves (cubic paths for organic shapes), no tiny noise under 10 px. Up to 45 elements.
-- Premium finish: smooth tapered curves, one consistent outline weight, a crisp glossy highlight on the head,
-  and a silhouette that still reads as a clean shape when filled solid black.
+  kept inside the base shape, 3) at most one small highlight, 4) the same outline path again with
+  fill="none" and stroke="#111111" (stroke-width 14 to 18, stroke-linejoin="round").
+- Background: one solid strong colour plus at most ONE big simple shape behind the character (a circle or a
+  bold ring). No sparkles, stars, confetti, bubbles or floating decorations.
+- Palette: 4 or 5 bold tones in total (base colours plus their shades) with one punchy accent, plus the
+  outline. Avoid pastel candy colours.
+- Draw back to front. The character spans 75 to 85% of the canvas; nothing touches the edges.
+- Clean, confident curves (cubic paths for organic shapes), nothing under 12 px. Up to 30 elements.
+- The silhouette must be instantly recognisable when filled solid black, and still readable at 32 px.
 - If the requested style asks for something simpler (minimal, pixel), the style wins over these rules.""",
 }
 
@@ -307,7 +309,9 @@ Check it against this checklist, then output an improved final version:
 - Craft check: curves meet cleanly, corner radii and line weights are consistent, nothing is a few pixels off,
   and the mark sits on its visual centre (not just the mathematical one).
 - It must look finished, never basic: if it feels flat or empty, add the missing depth (shade and highlight
-  shapes for mascots, one grey depth plane for marks) and, for mascots, the small background accents.
+  shapes for mascots, one grey depth plane for marks).
+- For meme mascots: it must read as a crypto meme coin mascot with attitude, not a children's cartoon.
+  Remove baby features (huge round eyes, blush, tears, sparkles, confetti) and toughen the expression if needed.
 {RULES_COLOR}
 Keep the same core idea unless it is unreadable. Same format rules: viewBox="0 0 512 512",
 xmlns="http://www.w3.org/2000/svg", background <rect> first, no text, gradients, filters, masks, images or scripts.
@@ -325,28 +329,28 @@ DIRECTION_LOGO = {
         "Use a single bold arc plus one dot, very minimal, like a modern app icon.",
     ],
     "meme": [
-        "Pose: front-facing with a huge confident grin.",
-        "Pose: winking, tongue slightly out, very playful.",
-        "Pose: smug side-eye, one eyebrow raised.",
-        "Pose: shocked, big round mouth, tiny sweat drop.",
-        "Pose: sleepy, half-closed eyes, totally unbothered.",
-        "Pose: excited, sparkly eyes, cheeks puffed.",
-        "Pose: cool, wearing tiny sunglasses pushed up on the head.",
-        "Pose: determined, squinting, ready for battle.",
+        "Expression: smug half-lidded smirk, looking straight at the viewer.",
+        "Expression: deadpan stare, completely unbothered, mouth a flat line.",
+        "Expression: side-eye with one raised eyebrow, plotting something.",
+        "Expression: wide chaotic grin, the moment the chart pumps.",
+        "Expression: cool and calm behind dark sunglasses, slight smirk.",
+        "Expression: heavy-lidded, hood up, quietly confident.",
+        "Expression: squinting, jaw set, diamond-hands determination.",
+        "Expression: mid-laugh, head tilted, enjoying the chaos.",
     ],
 }
-PALETTE_MEME = ["warm sunset colours", "fresh mint and teal", "bold purple and yellow", "candy pink and sky blue",
-              "lime green and orange", "deep blue and gold"]
+PALETTE_MEME = ["black and acid yellow", "deep green and cream", "bold purple and orange", "hot red and charcoal",
+              "electric blue and white", "forest green and gold"]
 
 COLOR_LOGO = {
     "ai": "- Colours: ONLY near-black #0a0a0a and white #ffffff, plus at most one grey #8a8a8a for a small accent.",
-    "meme": "- Colours: bold, cheerful, harmonious tones (max 6, base colours plus their darker shades) plus the dark outline. No gradients.",
+    "meme": "- Colours: bold, confident, harmonious tones (max 6, base colours plus their darker shades) plus the dark outline. No gradients.",
 }
 KIND_LOGO = {"ai": "an AI crypto project", "meme": "a meme coin"}
 
 STYLE_LOGO_MEME = {
-    "classic": "Bold cel-shaded cartoon mascot sticker, instantly readable.",
-    "mascot": "Cute chunky mascot with extra-big eyes and a round, squishy body shape.",
+    "classic": "Bold meme coin mascot portrait with attitude, thick outline, instantly readable as a token icon.",
+    "mascot": "Iconic PFP-style mascot bust with a strong personality, like the face of a top meme coin.",
     "pixel": "Retro pixel-art mascot made only of square <rect> blocks on a 32 px grid.",
     "minimal": "Minimal mascot icon: max 3 colours, no outline, the character reduced to a few smooth shapes, like a premium app icon.",
 }
