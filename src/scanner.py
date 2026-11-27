@@ -7,6 +7,8 @@ Installed from features.py via install(app, g).
 """
 import asyncio
 import json
+
+import httpx
 import re
 import time
 
@@ -18,6 +20,7 @@ DEAD = "0x000000000000000000000000000000000000dead"
 TOPIC_TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 SLOT_IMPL = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"  # EIP-1967 implementation slot
 CACHE_SECONDS = 300
+KEY_SYMBOL = "orynx:scan:symbols"  # ticker -> list of scanned contract addresses
 
 # function selectors that give someone special power over the token
 POWERS = {
@@ -201,6 +204,56 @@ def install(app, g):
             raise HTTPException(400, "Add ?token= with a 0x contract address.")
         return await run_scan(token.lower(), request)
 
+    @app.get("/api/scan/find")
+    async def scan_find(q: str = ""):
+        """Turn a ticker like $ORYNX into contract addresses on Robinhood Chain."""
+        sym = re.sub(r"[^A-Za-z0-9]", "", q or "").upper()[:16]
+        if not sym:
+            raise HTTPException(400, "Add ?q= with a ticker.")
+        found: dict = {}
+        own = g.get("ORYNX_TOKEN") or ""
+        if own and sym == "ORYNX":
+            found[own] = {"token": own, "name": "Orynx", "symbol": "ORYNX", "liquidity": None, "source": "orynx"}
+        try:
+            known = await redis("HGET", KEY_SYMBOL, sym)
+            for a in json.loads(known or "[]"):
+                found.setdefault(a, {"token": a, "name": "", "symbol": sym, "liquidity": None, "source": "scanned"})
+        except Exception:
+            pass
+        try:
+            async with httpx.AsyncClient(timeout=6) as client:
+                r = await client.get("https://api.dexscreener.com/latest/dex/search", params={"q": sym})
+                pairs = r.json().get("pairs") or []
+            for p in pairs:
+                b = p.get("baseToken") or {}
+                if p.get("chainId") != "robinhood" or (b.get("symbol") or "").upper() != sym:
+                    continue
+                a = (b.get("address") or "").lower()
+                if not re.fullmatch(r"0x[0-9a-f]{40}", a):
+                    continue
+                liq = float((p.get("liquidity") or {}).get("usd") or 0)
+                cur = found.get(a)
+                if cur is None:
+                    found[a] = {"token": a, "name": (b.get("name") or "")[:40], "symbol": sym, "liquidity": liq, "source": "dexscreener"}
+                else:
+                    cur["name"] = cur["name"] or (b.get("name") or "")[:40]
+                    cur["liquidity"] = max(cur["liquidity"] or 0, liq)
+        except Exception as err:
+            log.warning("Ticker search failed: %s", err)
+        out = sorted(found.values(), key=lambda x: (x["source"] != "orynx", -(x["liquidity"] or 0)))
+        return {"symbol": sym, "matches": out[:5]}
+
+    async def remember_symbol(symbol: str, token: str):
+        sym = re.sub(r"[^A-Za-z0-9]", "", symbol or "").upper()[:16]
+        if not sym:
+            return
+        try:
+            have = json.loads(await redis("HGET", KEY_SYMBOL, sym) or "[]")
+            if token not in have:
+                await redis("HSET", KEY_SYMBOL, sym, json.dumps((have + [token])[-5:]))
+        except Exception:
+            pass
+
     @app.post("/api/scan")
     async def scan(data: ScanRequest, request: Request):
         return await run_scan(data.token.lower(), request)
@@ -237,6 +290,7 @@ def install(app, g):
         res = {"token": token, "name": facts.get("name", ""), "symbol": facts.get("symbol", ""), "verdict": verdict,
                "score": score, "flags": flags, "take": take[:600], "facts": facts}
         g["add_usage"](who, "scan")
+        await remember_symbol(res["symbol"], token)
         memo[token] = (res, time.time())
         try:
             await redis("SET", "orynx:scan:" + token, json.dumps(res), "EX", str(CACHE_SECONDS))

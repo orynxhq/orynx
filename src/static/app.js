@@ -1095,9 +1095,94 @@ function addMessage(role, text) {
   $("log").append(d); $("log").scrollTop = $("log").scrollHeight;
   return d;
 }
+// Si Dev can run the red flag scanner from chat: paste a 0x address, or ask "check $TICKER".
+let openFullScan = null;
+const CHECK_WORDS = /\b(check|scan|cek|periksa|audit|safe|aman|legit|rug|scam|red ?flags?|risk|risky)\b/i;
+function scanIntent(text) {
+  const ca = text.match(/0x[0-9a-fA-F]{40}/);
+  if (ca) return { ca: ca[0] };
+  const tk = text.match(/\$([A-Za-z][A-Za-z0-9]{1,15})\b/);
+  if (tk && CHECK_WORDS.test(text)) return { ticker: tk[1].toUpperCase() };
+  return null;
+}
+const SC_LEVEL = { low: "Low risk", medium: "Medium risk", high: "High risk" };
+const SC_ICON = { red: "!", amber: "~", green: "✓" };
+function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function scanCard(r) {
+  const f = r.facts || {};
+  const box = el("div", "chat-scan");
+  const head = el("div", "cs-head");
+  const id = el("div", "cs-id");
+  id.append(el("b", "", (r.name || "Unknown token") + (r.symbol ? " $" + r.symbol : "")), el("small", "", r.token.slice(0, 6) + "…" + r.token.slice(-4)));
+  const v = el("div", "cs-verdict " + r.verdict); v.append(el("b", "", String(r.score)), el("span", "", SC_LEVEL[r.verdict] || r.verdict));
+  head.append(id, v); box.append(head);
+  const ul = el("ul", "cs-flags");
+  (r.flags || []).slice(0, 4).forEach((x) => { const li = el("li", x.level); li.append(el("i", "", SC_ICON[x.level] || ""), el("span", "", x.title)); ul.append(li); });
+  if (ul.children.length) box.append(ul);
+  const bits = [];
+  if (f.holders) bits.push(num(f.holders.count) + " holders", "top 10 hold " + f.holders.top10.toFixed(1) + "%");
+  if (f.bonding) bits.push(f.bonding.graduated ? "graduated on pons" : "pons curve " + f.bonding.percent + "%");
+  if ("renounced" in f) bits.push(f.renounced ? "owner renounced" : "owner active");
+  if (bits.length) box.append(el("p", "cs-facts", bits.join(" · ")));
+  if (r.take) box.append(el("p", "cs-take", r.take));
+  const more = el("button", "cs-more", "Open full report →"); more.type = "button";
+  more.onclick = () => { if (openFullScan) openFullScan(r); };
+  box.append(more);
+  return box;
+}
+function scanSummary(r) {
+  const f = r.facts || {};
+  const lines = [`Scan of ${r.name || "token"} ${r.symbol ? "$" + r.symbol : ""} (${r.token}): ${SC_LEVEL[r.verdict] || r.verdict}, risk score ${r.score}/100.`];
+  (r.flags || []).forEach((x) => lines.push(`- [${x.level}] ${x.title}: ${x.detail}`));
+  if (f.holders) lines.push(`Holders ${f.holders.count}, top 10 hold ${f.holders.top10.toFixed(1)}%, largest ${f.holders.top1.toFixed(1)}%.`);
+  if (f.bonding) lines.push(f.bonding.graduated ? "Graduated from the pons curve." : `pons bonding curve ${f.bonding.percent}% filled.`);
+  if (r.take) lines.push(r.take);
+  return lines.join("\n");
+}
+async function chatScan(text, intent, t) {
+  let ca = intent.ca;
+  if (!ca) {
+    const found = await api("/api/scan/find?q=" + encodeURIComponent(intent.ticker));
+    const m = found.matches || [];
+    if (!m.length) {
+      const msg = `I couldn't find $${intent.ticker} on Robinhood Chain. Paste its contract address (0x…) and I'll check it.`;
+      t.classList.remove("typing"); t.querySelector("p").textContent = msg;
+      records.push({ role: "assistant", content: msg }); return;
+    }
+    if (m.length > 1 && m[0].source !== "orynx") {
+      const msg = `There are ${m.length} tokens using $${intent.ticker}. Copycats are common, so pick the right contract:`;
+      t.classList.remove("typing"); t.querySelector("p").textContent = msg;
+      const list = el("div", "cs-pick");
+      m.forEach((x) => {
+        const b = el("button", "", `${x.name || "$" + x.symbol} · ${x.token.slice(0, 6)}…${x.token.slice(-4)}${x.liquidity ? " · $" + num(Math.round(x.liquidity)) + " liq" : ""}`);
+        b.type = "button"; b.onclick = () => { if (!chatBusy) sendChat("Check " + x.token); };
+        list.append(b);
+      });
+      t.append(list); records.push({ role: "assistant", content: msg + " " + m.map((x) => x.token).join(", ") }); return;
+    }
+    ca = m[0].token;
+  }
+  const r = await api("/api/scan", { token: ca });
+  t.classList.remove("typing");
+  t.querySelector("p").textContent = r.verdict === "low" ? "Here's what the chain says. Nothing loud, but read the details." : r.verdict === "medium" ? "A few things worth knowing before you touch this one." : "I'd be careful here. Look at these:";
+  t.append(scanCard(r));
+  records.push({ role: "assistant", content: scanSummary(r) });
+}
 async function sendChat(text) {
   text = (text || "").trim();
   if (!text || chatBusy) return;
+  const intent = scanIntent(text);
+  if (intent) {
+    chatBusy = true; $("chatSend").disabled = true; $("starters").hidden = true;
+    addMessage("user", text); records.push({ role: "user", content: text });
+    $("chatText").value = ""; $("chatText").style.height = "";
+    const t = addMessage("bot", ""); t.classList.add("typing");
+    t.querySelector("p").replaceChildren(...[0, 1, 2].map(() => document.createElement("i")));
+    try { await chatScan(text, intent, t); }
+    catch (err) { t.remove(); records.pop(); addMessage("bot", err.message).classList.add("err"); }
+    finally { chatBusy = false; $("chatSend").disabled = false; $("log").scrollTop = $("log").scrollHeight; }
+    return;
+  }
   chatBusy = true; $("chatSend").disabled = true; $("starters").hidden = true;
   addMessage("user", text); records.push({ role: "user", content: text });
   $("chatText").value = ""; $("chatText").style.height = "";
@@ -1210,6 +1295,7 @@ loadQuota();
     catch (err) { $("scanErr").textContent = err.message; }
     finally { b.disabled = false; b.textContent = t; }
   }
+  openFullScan = (r) => { $("scanCa").value = r.token; location.hash = "#scan"; setTimeout(() => show(r), 60); };
   form.addEventListener("submit", (e) => { e.preventDefault(); run($("scanCa").value); });
   $("scanOrynx").onclick = () => { const ca = (($("caHome") && $("caHome").textContent.trim()) || "0x5f19286a65d33e7c76b2c8c07ccbd4310aefbf20"); $("scanCa").value = ca; run(ca); };
 })();
