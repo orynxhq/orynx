@@ -799,6 +799,10 @@ def install(app, g):
             if not slug:
                 raise HTTPException(502, "Couldn't reserve a link. Try again.")
             key = _sec.token_hex(16)
+            try:
+                await _redis("INCR", "orynx:count:sites")
+            except Exception:
+                pass
         small = g["svg_to_png"](f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">'
                                 f'<image width="512" height="512" href="data:image/png;base64,{data.logo}" xlink:href="data:image/png;base64,{data.logo}"/></svg>', 512)
         site = {"name": data.name.strip(), "ticker": data.ticker.strip().upper(), "tagline": data.tagline.strip(), "mode": mode,
@@ -844,6 +848,47 @@ def install(app, g):
         if not b:
             return {"present": False}
         return {"present": True, "percent": b["percent"], "current": b["current"], "threshold": b["threshold"], "graduated": b["graduated"]}
+
+    async def _count_sites() -> int:
+        """Mini sites published so far. Counted once from storage, then kept up to date on each new site."""
+        n = await _redis("GET", "orynx:count:sites")
+        if n is not None:
+            return int(n)
+        total, cursor = 0, "0"
+        for _ in range(50):
+            res = await _redis("SCAN", cursor, "MATCH", "orynx:site:*", "COUNT", "500") or ["0", []]
+            cursor, keys = str(res[0]), res[1] or []
+            total += len(keys)
+            if cursor == "0":
+                break
+        await _redis("SET", "orynx:count:sites", str(total), "NX")
+        return total
+
+    @app.get("/api/stats")
+    async def stats():
+        """How much Orynx has been used. Only real counters; anything unknown is left out."""
+        save = _cache.get("stats")
+        if save and time.time() - save[1] < 120:
+            return save[0]
+        out: dict = {}
+        try:
+            out["kits"] = int(await _redis("GET", "orynx:kits") or 0)
+        except Exception:
+            pass
+        try:
+            out["shared"] = int(await _redis("LLEN", "orynx:gallery") or 0)
+        except Exception:
+            pass
+        try:
+            out["sites"] = await _count_sites()
+        except Exception:
+            pass
+        try:
+            out["scans"] = int(await _redis("GET", "orynx:count:scans") or 0)
+        except Exception:
+            pass
+        _cache["stats"] = (out, time.time())
+        return out
 
     @app.get("/s/{slug}/live", include_in_schema=False)
     async def site_live(slug: str):

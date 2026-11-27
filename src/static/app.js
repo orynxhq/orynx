@@ -1395,4 +1395,20 @@ loadQuota();
   });
 })();
 
+// usage numbers: only real counters, a cell shows once it has something to say
+(() => {
+  const row = $("usage"); if (!row) return;
+  fetch("/api/stats").then((r) => r.json()).then((s) => {
+    const cells = [];
+    if (s.kits >= 10) cells.push([s.kits, "launch kits built"]);
+    if (s.shared >= 3) cells.push([s.shared, "kits shared with the community"]);
+    if (s.sites >= 3) cells.push([s.sites, "mini sites published"]);
+    if (s.scans >= 10) cells.push([s.scans, "tokens scanned for red flags"]);
+    if (cells.length < 2) { row.closest("section").hidden = true; return; }
+    row.replaceChildren(...cells.map(([v, l]) => { const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = num(v); const sp = document.createElement("span"); sp.textContent = l; d.append(b, sp); return d; }));
+    row.style.setProperty("--n", Math.min(cells.length, 4));
+    row.hidden = false;
+  }).catch(() => { row.closest("section").hidden = true; });
+})();
+
 }

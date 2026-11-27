@@ -709,3 +709,26 @@
 @media (max-width:560px){.kitlist em{grid-column:1;margin-top:6px}}
 @media (max-width:820px){.cta-form{flex-basis:100%;max-width:none}}
 @media (max-width:560px){.cta-form{flex-direction:column}.cta-form .pill{width:100%}}
+
+/* usage numbers */
+.usage .usage-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.usage h2{margin:0}
+.usage .usage-head p{margin:0;color:var(--graphite);font-size:14px}
+.usage-row{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));border-top:1px solid var(--rule-d);border-bottom:1px solid var(--rule-d)}
+.usage-row div{padding:26px 22px 24px 0}
+.usage-row div+div{padding-left:22px;border-left:1px solid var(--rule-d)}
+.usage-row b{display:block;font:400 clamp(30px,3.6vw,46px)/1.05 var(--display)}
+.usage-row span{display:block;margin-top:8px;font-size:14px;color:var(--graphite)}
+/* roadmap */
+.road h2{margin:0 0 8px}
+.road-intro{margin:0 0 28px;color:var(--graphite)}
+.road-cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:20px}
+.road-col{border:1px solid var(--rule-d);border-radius:22px;padding:26px 28px;background:linear-gradient(150deg,rgba(255,255,255,.04),rgba(255,255,255,0) 55%),#070707}
+.road-col.next{background:#050505;border-style:dashed}
+.road-col h3{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:15px;font-weight:600}
+.road-col .dot{width:9px;height:9px;border-radius:50%;background:#555;display:inline-block}
+.road-col .dot.live{background:#4ade80;box-shadow:0 0 10px rgba(74,222,128,.7)}
+.road-col ul{list-style:none;margin:0;padding:0}
+.road-col li{padding:14px 0;border-top:1px solid var(--rule-d);color:var(--graphite);font-size:14.5px}
+.road-col li b{display:block;color:var(--paper);font-weight:600;font-size:16px;margin-bottom:3px}
+@media (max-width:860px){.usage-row{grid-template-columns:repeat(2,minmax(0,1fr))}.usage-row div:nth-child(3){padding-left:0;border-left:0}.usage-row div:nth-child(n+3){border-top:1px solid var(--rule-d)}.road-cols{grid-template-columns:1fr}}

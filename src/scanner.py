@@ -322,6 +322,10 @@ def install(app, g):
         res = {"token": token, "name": facts.get("name", ""), "symbol": facts.get("symbol", ""), "verdict": verdict,
                "score": score, "flags": flags, "take": take[:600], "facts": facts}
         g["add_usage"](who, "scan")
+        try:
+            await redis("INCR", "orynx:count:scans")
+        except Exception:
+            pass
         await remember_symbol(res["symbol"], token)
         memo[token] = (res, time.time())
         try:
