@@ -722,7 +722,7 @@
 /* roadmap */
 .road h2{margin:0 0 8px}
 .road-intro{margin:0 0 28px;color:var(--graphite)}
-.road-cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:20px}
+.road-cols{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:20px;align-items:start}
 .road-col{border:1px solid var(--rule-d);border-radius:22px;padding:26px 28px;background:linear-gradient(150deg,rgba(255,255,255,.04),rgba(255,255,255,0) 55%),#070707}
 .road-col.next{background:#050505;border-style:dashed}
 .road-col h3{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:15px;font-weight:600}
@@ -732,3 +732,8 @@
 .road-col li{padding:14px 0;border-top:1px solid var(--rule-d);color:var(--graphite);font-size:14.5px}
 .road-col li b{display:block;color:var(--paper);font-weight:600;font-size:16px;margin-bottom:3px}
 @media (max-width:860px){.usage-row{grid-template-columns:repeat(2,minmax(0,1fr))}.usage-row div:nth-child(3){padding-left:0;border-left:0}.usage-row div:nth-child(n+3){border-top:1px solid var(--rule-d)}.road-cols{grid-template-columns:1fr}}
+
+.road-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 28px}
+.road-g h4{margin:12px 0 2px;font-size:12.5px;font-weight:600;color:var(--smoke);letter-spacing:.02em}
+.road-g li{padding:11px 0}
+@media (max-width:860px){.road-groups{grid-template-columns:1fr}}
