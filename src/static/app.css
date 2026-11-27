@@ -675,3 +675,14 @@
 @media (max-width:900px){.deck{height:350px}.hero-side{gap:18px;border:0;background:none;overflow:visible;border-radius:0}
   .kc[data-pos="1"]{transform:translateY(-14px) scale(.95)}.kc[data-pos="2"]{transform:translateY(-26px) scale(.9)}}
 @media (prefers-reduced-motion:reduce){.kc{transition:none}}
+
+/* footer trust row: HEY badge sits with the other proof links */
+.foot-trust{display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:20px 28px;margin-top:48px;padding:20px 24px;border:1px solid var(--rule-d);border-radius:20px;background:linear-gradient(140deg,rgba(255,255,255,.04),rgba(255,255,255,0) 60%),#060606}
+.ft-label{font-size:13px;color:var(--graphite);white-space:nowrap}
+.ft-hey{display:block;line-height:0;border-radius:12px;overflow:hidden;transition:transform .15s}
+.ft-hey:hover{transform:translateY(-1px)}
+.ft-hey img{display:block;width:220px;height:auto}
+.ft-links{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.ft-links a{font-size:13px;color:#d6d6d6;text-decoration:none;border:1px solid var(--rule-d);border-radius:999px;padding:7px 14px;background:#0b0b0b}
+.ft-links a:hover{border-color:#4a4a4a;color:#fff}
+@media (max-width:860px){.foot-trust{grid-template-columns:1fr;justify-items:start;padding:18px}.ft-links{justify-content:flex-start}.ft-hey img{width:200px}}
