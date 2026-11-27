@@ -1381,4 +1381,18 @@ loadQuota();
   });
 })();
 
+// footer idea field: hand the sentence to the main builder and start it
+(() => {
+  const f = $("ctaForm"); if (!f) return;
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = $("ctaIde").value.trim();
+    location.hash = "#build";
+    setTimeout(() => {
+      $("ide").value = v; $("ide").focus();
+      if (v) $("form").requestSubmit();
+    }, 350);
+  });
+})();
+
 }

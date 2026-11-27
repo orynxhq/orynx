@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=15">
+<link rel="stylesheet" href="/app.css?v=16">
 </head>
 <body>
 
@@ -328,9 +328,12 @@
       <h2>How it works</h2>
       <p class="intro muted">Three steps from a rough idea to everything you need on launch day.</p>
       <ol class="steps">
-        <li><span class="n">1</span><h4>Describe your idea</h4><p>Pick AI project or meme coin, then describe it in one sentence.</p></li>
-        <li><span class="n">2</span><h4>Get roasted, then built</h4><p>{{NAME_BOT}} pokes holes in the pitch, then writes the name, story and posts, and draws two logos.</p></li>
-        <li><span class="n">3</span><h4>Launch on pons</h4><p>Copy the text, download the logo, and <a href="https://www.ponsfamily.com/launchpad/create" target="_blank" rel="noopener">create your token on pons</a> with everything ready.</p></li>
+        <li><span class="n">1</span><h4>Describe your idea</h4><p>Pick AI project or meme coin, then describe it in one sentence.</p>
+          <div class="sv sv-in" aria-hidden="true"><span>A furnace that fires raw memes into finished ones</span><i>Build my kit</i></div></li>
+        <li><span class="n">2</span><h4>Get roasted, then built</h4><p>{{NAME_BOT}} pokes holes in the pitch, then writes the name, story and posts, and draws two logos.</p>
+          <div class="sv sv-roast" aria-hidden="true"><b>{{NAME_BOT}}</b>Fine. Now tell me why anyone holds it past day two.</div></li>
+        <li><span class="n">3</span><h4>Launch on pons</h4><p>Copy the text, download the logo, and <a href="https://www.ponsfamily.com/launchpad/create" target="_blank" rel="noopener">create your token on pons</a> with everything ready.</p>
+          <div class="sv sv-go" aria-hidden="true"><i></i><span>Kiln <em>$KILN</em></span><b>Live on pons</b></div></li>
       </ol>
     </div>
   </section>
@@ -340,15 +343,18 @@
       <div>
         <h2>Everything for launch day, in one kit</h2>
         <p style="color:var(--graphite);margin:0">AI projects get a clear product story. Meme coins get a mascot, lore and posts made to spread. Either way you launch with everything ready.</p>
+        <p class="kit-eg">Grey lines show a real example kit for <b>Kiln $KILN</b>.</p>
       </div>
       <ul class="kitlist">
-        <li><b>Names and tickers</b><span>Three brandable options, each with a 3 to 6 letter ticker.</span></li>
-        <li><b>Logos</b><span>Two original logos: clean black-and-white marks for AI projects, bold mascots for meme coins.</span></li>
-        <li><b>Tagline</b><span>One line people remember.</span></li>
-        <li><b>Features or lore</b><span>Three product features for AI projects, or three lore points for meme coins.</span></li>
-        <li><b>Description</b><span>The story of your token, ready for your pons page.</span></li>
-        <li><b>X bio and first posts</b><span>A bio under 160 characters and three posts you can share in one tap.</span></li>
-        <li><b>Telegram welcome</b><span>A short message to pin when your community starts arriving.</span></li>
+        <li><b>Names and tickers</b><span>Three brandable options. Tap one to make it the name your kit uses.</span><em>Kiln · $KILN</em></li>
+        <li><b>Logos</b><span>Two original logos in the background colour you pick: clean marks for AI projects, mascots with attitude for meme coins.</span></li>
+        <li><b>X header</b><span>A 1500 × 500 banner with your logo and tagline, ready for your profile.</span></li>
+        <li><b>Tagline</b><span>One line people remember.</span><em>“Memes go in raw. They come out fired.”</em></li>
+        <li><b>Features or lore</b><span>Three product features for AI projects, or three lore points for meme coins.</span><em>Every round burns a slice of supply.</em></li>
+        <li><b>Story and X posts</b><span>The description for your pons page, an X bio and three first posts.</span><em>Drop a meme in. Watch it come out fired.</em></li>
+        <li><b>Launch thread</b><span>A ready-to-post thread for the moment you go live, with your CA and how to buy.</span></li>
+        <li><b>Telegram welcome</b><span>A short message to pin when your community starts arriving.</span><em>Welcome to the kiln. Bring your rawest memes.</em></li>
+        <li><b>Mini site</b><span>A one-page website for your token with your logo, address check and live chart.</span><em>orynxai.xyz/s/kiln</em></li>
       </ul>
     </div>
   </section>
@@ -466,7 +472,7 @@
   <div class="shell">
     <div class="foot-cta">
       <div><h2>Ready when your idea is.</h2><p>One sentence in. A launch-ready kit out.</p></div>
-      <a class="pill solid" href="#build">Build a kit</a>
+      <form class="cta-form" id="ctaForm" autocomplete="off"><input id="ctaIde" maxlength="200" placeholder="Describe your token in one sentence" aria-label="Describe your token"><button class="pill solid" type="submit">Build a kit</button></form>
     </div>
     <div class="foot-grid">
       <div>
@@ -504,7 +510,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=12"></script>
+<script src="/app.js?v=13"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>
