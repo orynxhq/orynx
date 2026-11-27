@@ -1049,7 +1049,11 @@ async def make_logo(data: LogoRequest, request: Request):
         if time.time() - t_start > 30:
             break
         try:
-            answer = await ask_ai(MODEL_LOGO, rules_logo, message, 6000, timeout=60)
+            answer = await ask_ai(MODEL_LOGO, rules_logo, message, 12000, timeout=60)
+            if "<svg" in answer.lower() and "</svg>" not in answer.lower():
+                log.warning("Logo answer cut off at %d chars", len(answer))
+            elif "<svg" not in answer.lower():
+                log.warning("Logo answer without SVG (%d chars): %r", len(answer), answer[:300])
             svg = get_svg(answer)
             await asyncio.to_thread(svg_to_png, svg, 64)
             if time.time() - t_start < 50:
