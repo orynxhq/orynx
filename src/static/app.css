@@ -560,3 +560,6 @@
   .hero-side .stat + .stat{border-left:1px solid var(--rule-d)}
   .hero-side .stat b{font-size:16px}
 }
+.ca-more{display:inline-block;margin-top:6px;color:var(--paper);font-weight:600;font-size:15px;text-decoration:none;border-bottom:1px solid #444;padding-bottom:2px}
+.ca-more:hover{border-color:var(--paper)}
+.ca-box .ca-warn{margin-top:18px!important}
