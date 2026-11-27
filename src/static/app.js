@@ -1329,4 +1329,56 @@ loadQuota();
   $("scanOrynx").onclick = () => { const ca = (($("caHome") && $("caHome").textContent.trim()) || "0x5f19286a65d33e7c76b2c8c07ccbd4310aefbf20"); $("scanCa").value = ca; run(ca); };
 })();
 
+// ---------- hero deck: real kits from the community, one at a time ----------
+(() => {
+  const deck = $("deck"); if (!deck) return;
+  const SAMPLE = [
+    { name: "Ledgerline", ticker: "LDGR", mode: "ai", tagline: "An AI analyst that reads every wallet move so you don't have to.", logo: "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a"/><rect x="136" y="136" width="240" height="240" rx="56" fill="none" stroke="#fff" stroke-width="40"/><path d="M196 300l50-60 40 36 50-70" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/></svg>') },
+    { name: "Kiln", ticker: "KILN", mode: "meme", tagline: "Memes go in raw. They come out fired.", logo: "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1b1410"/><path d="M120 400V250C120 165 182 112 256 112s136 53 136 138v150z" fill="#c2410c" stroke="#111" stroke-width="16"/><path d="M170 400V290c0-52 38-86 86-86s86 34 86 86v110z" fill="#111"/><path d="M256 380c-42 0-60-28-50-58 8-24 30-32 34-60 22 18 28 38 22 56 14-8 20-22 22-36 22 22 28 48 18 70-8 18-24 28-46 28z" fill="#facc15"/></svg>') },
+    { name: "Signalnest", ticker: "NEST", mode: "ai", tagline: "Your trading copilot for tokenized stocks, awake 24/7.", logo: "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a"/><circle cx="256" cy="256" r="46" fill="#fff"/><path d="M160 256a96 96 0 0 1 192 0M110 256a146 146 0 0 1 292 0" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round"/></svg>') },
+  ];
+  let cards = [], timer = 0;
+  function card(it, real) {
+    const a = document.createElement(real ? "a" : "div"); a.className = "kc"; if (real) a.href = `/k/${it.id}`;
+    const tp = document.createElement("span"); tp.className = "kc-type"; tp.textContent = it.mode === "meme" ? "Meme coin" : "AI project";
+    const top = document.createElement("div"); top.className = "kc-top";
+    const img = document.createElement("img"); img.alt = ""; img.src = real ? `/api/gallery/logo/${it.id}` : it.logo;
+    const nm = document.createElement("div"); const b = document.createElement("b"); b.textContent = it.name; const c = document.createElement("code"); c.textContent = it.ticker ? "$" + it.ticker : "";
+    nm.append(b, c); top.append(img, nm);
+    const tag = document.createElement("p"); tag.className = "kc-tag"; tag.textContent = it.tagline || "";
+    const parts = document.createElement("div"); parts.className = "kc-parts";
+    ["Name", "Logo", "Tagline", "Story", "X posts", "Mini site"].forEach((t) => { const s = document.createElement("span"); s.textContent = t; parts.append(s); });
+    const src = document.createElement("span"); src.className = "kc-src"; src.textContent = real ? "Built by the community on Orynx" : "Example kit";
+    a.append(tp, top, tag, parts, src);
+    return a;
+  }
+  function place() { cards.forEach((c, i) => { c.dataset.pos = i < 3 ? String(i) : "2"; c.style.visibility = i < 3 ? "visible" : "hidden"; c.setAttribute("aria-hidden", String(i !== 0)); c.tabIndex = i === 0 ? 0 : -1; }); }
+  function next() {
+    if (cards.length < 2 || document.hidden) return;
+    const first = cards[0]; first.dataset.pos = "out";
+    setTimeout(() => { cards.push(cards.shift()); place(); }, 650);
+  }
+  function build(items) {
+    const real = (items || []).filter((it) => it && it.id && it.name).slice(0, 6);
+    const list = real.length >= 3 ? real.map((it) => card(it, true)) : SAMPLE.map((it) => card(it, false));
+    deck.replaceChildren(...list.slice().reverse()); cards = list; place();
+    clearInterval(timer);
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(next, 3800);
+  }
+  window.orynxDeck = build;
+  build([]);
+  fetch("/api/gallery").then((r) => r.json()).then((g) => { if (g && g.items && g.items.length >= 3) build(g.items); }).catch(() => {});
+  // proof strip: live numbers for $ORYNX
+  const proof = $("proof");
+  Promise.allSettled([fetch("/api/holders").then((r) => r.json()), fetch("/api/burn").then((r) => r.json()), fetch("/api/bonding").then((r) => r.json())]).then(([h, b, c]) => {
+    const cells = [];
+    if (h.value && h.value.holders) cells.push([num(h.value.holders), "$ORYNX holders"]);
+    if (b.value && b.value.active) cells.push([b.value.percent.toFixed(2) + "%", "of supply burned"]);
+    if (c.value && c.value.present) cells.push([c.value.graduated ? "Graduated" : c.value.percent.toFixed(1) + "%", c.value.graduated ? "on Uniswap v4" : "pons curve filled"]);
+    if (cells.length < 2) return;
+    proof.replaceChildren(...cells.map(([v, l]) => { const d = document.createElement("div"); const bb = document.createElement("b"); bb.textContent = v; const s = document.createElement("span"); s.textContent = l; d.append(bb, s); return d; }));
+    proof.hidden = false;
+  });
+})();
+
 }
