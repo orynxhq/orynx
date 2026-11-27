@@ -262,6 +262,9 @@ DESIGN_LOGO = {
   notch, a gap, an orbit or a hidden second meaning.
 - Exact, symmetric coordinates where it fits (centre is 256,256). The mark spans about 55 to 65% of the canvas.
 - It must still read clearly at 32 px. When in doubt, remove a shape.
+- Premium craft: build on a 16 px grid, align centres and tangents exactly, keep every corner radius
+  the same, let curves meet smoothly (no kinks or wobbly joins) and give the mark generous breathing room.
+  It should feel like a top design studio drew it, not a template.
 - Depth: you may use the grey #8a8a8a for ONE plane (a fold, an overlap, the far side of a ribbon or
   a shadow side) so the mark feels dimensional and crafted, not flat clip art.
 - Avoid cliches: eyes (especially an eye in a triangle or pyramid), brains, robot heads, circuit-board traces,
@@ -287,6 +290,8 @@ that sits on the ring with a background-coloured halo cutting a gap into the rin
 - Palette: 5 or 6 harmonious, saturated tones in total (base colours plus their shades), plus the outline.
 - Draw back to front. The character spans 70 to 80% of the canvas; nothing touches the edges.
 - Clean, confident curves (cubic paths for organic shapes), no tiny noise under 10 px. Up to 45 elements.
+- Premium finish: smooth tapered curves, one consistent outline weight, a crisp glossy highlight on the head,
+  and a silhouette that still reads as a clean shape when filled solid black.
 - If the requested style asks for something simpler (minimal, pixel), the style wins over these rules.""",
 }
 
@@ -296,6 +301,8 @@ Check it against this checklist, then output an improved final version:
 - Optically centred and balanced, inside the safe area 96 to 416, nothing cropped or touching the edges.
 - Bold, consistent shapes and line weights; clean geometry; no accidental gaps, slivers or overlaps.
 - It looks like a premium, professional brand mark that people would proudly put on their token page.
+- Craft check: curves meet cleanly, corner radii and line weights are consistent, nothing is a few pixels off,
+  and the mark sits on its visual centre (not just the mathematical one).
 - It must look finished, never basic: if it feels flat or empty, add the missing depth (shade and highlight
   shapes for mascots, one grey depth plane for marks) and, for mascots, the small background accents.
 {RULES_COLOR}
@@ -540,48 +547,69 @@ def svg_to_png(svg: str, size: int = 1024) -> bytes:
     return bytes(resvg_py.svg_to_bytes(svg_string=svg, width=size, height=size))
 
 
+def _shade(rr: int, gg: int, bb: int, f: float) -> str:
+    """Lighten (f > 0) or darken (f < 0) a colour."""
+    if f >= 0:
+        c = [round(v + (255 - v) * f) for v in (rr, gg, bb)]
+    else:
+        c = [round(v * (1 + f)) for v in (rr, gg, bb)]
+    return "#%02x%02x%02x" % tuple(max(0, min(255, v)) for v in c)
+
+
 def polish_logo(svg: str, mode: str, style: str) -> str:
-    """Same finishing layer for every logo: soft light, shadow, vignette."""
+    """Premium finishing layer for every logo: a lit backdrop in the logo's own colour, a soft glow
+    and contact shadow under the mark, light from the top, a fine film grain and a vignette."""
     try:
         m = re.search(r"<svg\b[^>]*>(.*)</svg>", svg, flags=re.DOTALL | re.IGNORECASE)
         fill = m.group(1)
         r = re.search(r"<rect\b[^>]*?/>", fill)
         if not r or "512" not in r.group(0):
             return svg
-        backdrop = r.group(0)
         left = fill[: r.start()] + fill[r.end():]
-        w = re.search(r'fill\s*=\s*"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})"', backdrop)
+        w = re.search(r'fill\s*=\s*"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})"', r.group(0))
         hexa = w.group(1) if w else "0a0a0a"
         if len(hexa) == 3:
             hexa = "".join(c * 2 for c in hexa)
         rr, gg, bb = (int(hexa[i:i + 2], 16) for i in (0, 2, 4))
         bright = (0.299 * rr + 0.587 * gg + 0.114 * bb) > 150
-        if mode == "ai":
-            light, vignette = (".09", ".55") if not bright else ("0", ".12")
-            return (
-                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>'
-                f'<radialGradient id="oxG" cx="50%" cy="45%" r="62%"><stop offset="0" stop-color="#fff" stop-opacity="{light}"/>'
-                '<stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
-                f'<radialGradient id="oxV" cx="50%" cy="50%" r="72%"><stop offset=".62" stop-color="#000" stop-opacity="0"/>'
-                f'<stop offset="1" stop-color="#000" stop-opacity="{vignette}"/></radialGradient></defs>'
-                f'{backdrop}{left}<rect width="512" height="512" fill="url(#oxG)"/>'
-                '<rect width="512" height="512" fill="url(#oxV)"/></svg>'
-            )
+        base = "#" + hexa.lower()
+        # shapes painted in the background colour are cut-outs: give them the same lit backdrop so they stay seamless
+        forms = [hexa] + ([hexa[0::2]] if hexa[0::2] == hexa[1::2] else [])
+        for f in forms:
+            left = re.sub(r'((?:fill|stroke)\s*=\s*)"#%s"' % f, r'\1"url(#oxB)"', left, flags=re.IGNORECASE)
         if bright:
-            light, vignette, shadow = ".45", ".14", '<feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".2"/>'
+            top, edge = _shade(rr, gg, bb, .55), _shade(rr, gg, bb, -.10)
+            sheen, vignette, grain = ".35", ".10", ".035"
+            glow = ""
+            shadow = (10, 12, ".16")
         else:
-            light, vignette, shadow = ".26", ".38", '<feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000" flood-opacity=".35"/>'
+            top, edge = _shade(rr, gg, bb, .16 if mode == "ai" else .22), _shade(rr, gg, bb, -.45)
+            sheen, vignette, grain = (".07", ".50", ".05") if mode == "ai" else (".22", ".34", ".045")
+            glow = ('<filter id="oxL" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="22"/></filter>'
+                    if mode == "ai" else "")
+            shadow = (14, 14, ".45") if mode == "ai" else (12, 12, ".35")
         if style == "pixel":
-            shadow = '<feDropShadow dx="0" dy="8" stdDeviation="0" flood-color="#000" flood-opacity=".3"/>'
+            shadow = (8, 0, ".3")
+            glow = ""
+        solid = re.sub(r'<(?:circle|ellipse|rect|path|polygon|polyline|line)\b[^>]*"url\(#oxB\)"[^>]*/>', "", left)
+        halo = f'<g filter="url(#oxL)" opacity=".22">{solid}</g>' if glow else ""
+        dy, blur, alpha = shadow
+        shadow = (f'<feGaussianBlur in="SourceAlpha" stdDeviation="{blur}"/><feOffset dy="{dy}"/>'
+                  f'<feComponentTransfer><feFuncA type="linear" slope="{alpha}"/></feComponentTransfer>')
         return (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>'
-            f'<radialGradient id="oxG" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity="{light}"/>'
-            '<stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
-            f'<radialGradient id="oxV" cx="50%" cy="50%" r="72%"><stop offset=".62" stop-color="#000" stop-opacity="0"/>'
+            f'<radialGradient id="oxB" gradientUnits="userSpaceOnUse" cx="256" cy="174" r="400"><stop offset="0" stop-color="{top}"/>'
+            f'<stop offset=".55" stop-color="{base}"/><stop offset="1" stop-color="{edge}"/></radialGradient>'
+            f'<linearGradient id="oxG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="{sheen}"/>'
+            '<stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>'
+            f'<radialGradient id="oxV" cx="50%" cy="50%" r="72%"><stop offset=".6" stop-color="#000" stop-opacity="0"/>'
             f'<stop offset="1" stop-color="#000" stop-opacity="{vignette}"/></radialGradient>'
-            f'<filter id="oxS" x="-25%" y="-25%" width="150%" height="150%">{shadow}</filter></defs>'
-            f'{backdrop}<rect width="512" height="512" fill="url(#oxG)"/><g filter="url(#oxS)">{left}</g>'
-            '<rect width="512" height="512" fill="url(#oxV)"/></svg>'
+            f'<filter id="oxS" x="-25%" y="-25%" width="150%" height="150%">{shadow}</filter>{glow}'
+            '<filter id="oxN" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/>'
+            f'<feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 {grain} 0"/></filter></defs>'
+            f'<rect width="512" height="512" fill="url(#oxB)"/>{halo}<g filter="url(#oxS)">{solid}</g>{left}'
+            '<rect width="512" height="512" fill="url(#oxG)"/><rect width="512" height="512" fill="url(#oxV)"/>'
+            '<rect width="512" height="512" filter="url(#oxN)"/></svg>'
         )
     except Exception:
         return svg
