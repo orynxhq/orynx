@@ -136,6 +136,24 @@ footer{padding:36px 0 48px;border-top:var(--bw) solid var(--line);display:flex;f
   .has-ca footer{padding-bottom:110px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.coin.spin{animation:none}.btn,.bar i,.coin{transition:none}}
+
+/* live numbers */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:var(--bw) solid var(--line)}
+.stats div{padding:26px 24px 24px 0}
+.stats div+div{padding-left:24px;border-left:var(--bw) solid var(--line)}
+.stats b{display:block;font-family:var(--disp);font-weight:{{H1_WEIGHT}};font-size:clamp(28px,3.4vw,44px);line-height:1.05;letter-spacing:{{H1_TRACK}}}
+.stats span{display:block;font-size:14px;color:var(--muted);margin-top:6px}
+.scan{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;padding:18px 24px;border-radius:var(--r);border:var(--bw) solid var(--line);background:var(--card)}
+.scan .pill{font-weight:700;font-size:14px;padding:6px 14px;border-radius:999px;background:#16a34a;color:#fff}
+.scan .pill.medium{background:#d97706}.scan .pill.high{background:#dc2626}
+.scan ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;flex:1;min-width:0}
+.scan li::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#16a34a;margin-right:8px;vertical-align:middle}
+.scan li.w::before{background:#d97706}
+.scan a{font-size:14px;font-weight:600;color:var(--muted)}
+.chart{border-radius:var(--r);overflow:hidden;border:var(--bw) solid var(--line);background:var(--card);height:min(520px,70vh)}
+.chart iframe{width:100%;height:100%;border:0;display:block}
+.share{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:14px}
+@media (max-width:860px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stats div:nth-child(3){padding-left:0;border-left:0}.stats div:nth-child(n+3){border-top:var(--bw) solid var(--line)}}
 </style>
 </head>
 <body class="{{BODY_CLASS}}" data-theme="{{THEME}}">
@@ -158,10 +176,17 @@ footer{padding:36px 0 48px;border-top:var(--bw) solid var(--line);display:flex;f
     </div>
   </div>
 
+  <div class="wrap"><div class="stats" id="stats" hidden></div></div>
+
   <div class="band" aria-hidden="true"><span>{{TICKER_BIG}}</span><span>{{TICKER_BIG}}</span><span>{{TICKER_BIG}}</span><span>{{TICKER_BIG}}</span></div>
 
   <div class="wrap">
     {{CA_BLOCK}}
+
+    <section id="chartSec" aria-labelledby="chart-h" hidden>
+      <h2 id="chart-h">Live chart</h2>
+      <div class="chart" id="chart"></div>
+    </section>
 
     <section class="about" aria-labelledby="about-h">
       <h2 id="about-h">About {{NAME}}</h2>
@@ -183,6 +208,7 @@ footer{padding:36px 0 48px;border-top:var(--bw) solid var(--line);display:flex;f
       <h2 id="end-h">{{NAME}}</h2>
       <p>{{TAGLINE}}</p>
       <div class="cta">{{FOLLOW}}</div>
+      <div class="share"><a class="btn" id="shX" href="#" target="_blank" rel="noopener">Share on X</a><button class="btn" type="button" id="shLink">Copy page link</button></div>
     </section>
 
     <footer>
@@ -212,6 +238,24 @@ footer{padding:36px 0 48px;border-top:var(--bw) solid var(--line);display:flex;f
   var bd=document.getElementById('bond');
   if(bd){fetch(bd.dataset.src).then(function(r){return r.json()}).then(function(h){if(!h.present)return;bd.hidden=false;var p=Math.max(0,Math.min(100,h.percent));document.getElementById('bp').textContent=p.toFixed(1)+'%';
     document.getElementById('bn').textContent=h.graduated?'Graduated into a locked Uniswap v4 pool.':(h.current.toFixed(3)+' of '+h.threshold.toFixed(2)+' ETH raised. At 100% it moves into a locked Uniswap v4 pool.');requestAnimationFrame(function(){document.getElementById('bf').style.width=Math.max(2,p)+'%'})}).catch(function(){})}
+  var shX=document.getElementById('shX');
+  if(shX){shX.href='https://x.com/intent/post?text='+encodeURIComponent(document.title+'\n'+(document.querySelector('meta[name=description]')||{}).content+'\n\n'+location.href.split('#')[0]);}
+  var shL=document.getElementById('shLink');
+  if(shL){shL.onclick=function(){(navigator.clipboard?navigator.clipboard.writeText(location.href.split('#')[0]):Promise.reject()).then(function(){shL.textContent='Link copied';setTimeout(function(){shL.textContent='Copy page link'},1400)}).catch(function(){})}}
+  if(ca){fetch('{{PATH}}/live').then(function(r){return r.json()}).then(function(L){
+    if(!L.present)return;
+    var st=document.getElementById('stats'),cells=[];
+    if(L.holders){cells.push([L.holders.count,'holders']);cells.push([L.holders.top10+'%','held by the top 10']);cells.push([L.holders.burned+'%','burned for good']);}
+    if(L.bonding){cells.push([L.bonding.graduated?'Graduated':L.bonding.percent+'%',L.bonding.graduated?'locked Uniswap v4 pool':'of the pons curve filled']);}
+    if(cells.length>=2){st.innerHTML='';cells.forEach(function(c){var d=document.createElement('div'),b=document.createElement('b'),sp=document.createElement('span');b.textContent=c[0];sp.textContent=c[1];d.append(b,sp);st.append(d)});st.hidden=false;}
+    if(L.scan){var v=document.getElementById('verify');if(v){var box=document.createElement('div');box.className='scan';
+      var pill=document.createElement('span');pill.className='pill '+L.scan.verdict;pill.textContent=({low:'Low risk',medium:'Medium risk',high:'High risk'})[L.scan.verdict]+' · '+L.scan.score+'/100';
+      var ul=document.createElement('ul');(L.scan.warn||[]).forEach(function(t){var li=document.createElement('li');li.className='w';li.textContent=t;ul.append(li)});(L.scan.good||[]).forEach(function(t){var li=document.createElement('li');li.textContent=t;ul.append(li)});
+      var a=document.createElement('a');a.href='https://orynxai.xyz/#scan';a.target='_blank';a.rel='noopener';a.textContent='Scanned on-chain by Orynx';
+      box.append(pill,ul,a);v.append(box);}}
+    if(L.pair){var c=document.getElementById('chart'),dark=getComputedStyle(document.body).backgroundColor.match(/\d+/g);var lum=dark?(+dark[0]*.299+ +dark[1]*.587+ +dark[2]*.114):0;var th=lum>140?'light':'dark';
+      var f=document.createElement('iframe');f.title='Price chart';f.loading='lazy';f.src='https://dexscreener.com/robinhood/'+L.pair+'?embed=1&loadChartSettings=0&trades=0&info=0&chartLeftToolbar=0&chartTheme='+th+'&theme='+th+'&chartStyle=1&chartType=usd&interval=15';c.append(f);document.getElementById('chartSec').hidden=false;}
+  }).catch(function(){})}
 })();
 </script>
 </body>

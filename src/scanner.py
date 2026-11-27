@@ -204,6 +204,38 @@ def install(app, g):
             raise HTTPException(400, "Add ?token= with a 0x contract address.")
         return await run_scan(token.lower(), request)
 
+    async def scan_quiet(token: str) -> dict | None:
+        """Scan without a visitor quota or an AI take, for mini sites. Shares the scan cache."""
+        token = token.lower()
+        hit = memo.get(token)
+        if hit and time.time() - hit[1] < CACHE_SECONDS:
+            return hit[0]
+        try:
+            raw = await redis("GET", "orynx:scan:" + token)
+            if raw:
+                res = json.loads(raw)
+                memo[token] = (res, time.time())
+                return res
+        except Exception:
+            pass
+        try:
+            facts = await read_facts(token)
+        except Exception as err:
+            log.warning("Quiet scan failed: %s", err)
+            return None
+        flags, score = flags_for(facts)
+        verdict = "high" if score >= 60 else "medium" if score >= 30 else "low"
+        res = {"token": token, "name": facts.get("name", ""), "symbol": facts.get("symbol", ""), "verdict": verdict,
+               "score": score, "flags": flags, "take": "", "facts": facts}
+        memo[token] = (res, time.time())
+        try:
+            await redis("SET", "orynx:scan:" + token, json.dumps(res), "EX", str(CACHE_SECONDS))
+        except Exception:
+            pass
+        return res
+
+    g["scan_quiet"] = scan_quiet
+
     @app.get("/api/scan/find")
     async def scan_find(q: str = ""):
         """Turn a ticker like $ORYNX into contract addresses on Robinhood Chain."""

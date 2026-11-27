@@ -8,6 +8,8 @@ import asyncio
 import hashlib
 import hmac
 import json
+
+import httpx
 import re
 import time
 
@@ -842,6 +844,46 @@ def install(app, g):
         if not b:
             return {"present": False}
         return {"present": True, "percent": b["percent"], "current": b["current"], "threshold": b["threshold"], "graduated": b["graduated"]}
+
+    @app.get("/s/{slug}/live", include_in_schema=False)
+    async def site_live(slug: str):
+        """Live numbers for a mini site: holders, burn, safety scan and the DEX Screener pair if one exists."""
+        s = await _get_site(slug)
+        if not s or not s.get("ca"):
+            return {"present": False}
+        ca = s["ca"]
+        save = _cache.get("live:" + ca)
+        if save and time.time() - save[1] < 120:
+            return save[0]
+        out: dict = {"present": True}
+        scan = None
+        if g.get("scan_quiet"):
+            try:
+                scan = await asyncio.wait_for(g["scan_quiet"](ca), 25)
+            except Exception:
+                scan = None
+        if scan:
+            f = scan.get("facts") or {}
+            h = f.get("holders") or {}
+            out["scan"] = {"verdict": scan.get("verdict"), "score": scan.get("score"),
+                           "good": [x["title"] for x in scan.get("flags", []) if x.get("level") == "green"][:3],
+                           "warn": [x["title"] for x in scan.get("flags", []) if x.get("level") in ("red", "amber")][:3]}
+            if h:
+                out["holders"] = {"count": h.get("count"), "top10": round(h.get("top10", 0), 1), "burned": round(h.get("burned", 0), 2)}
+            if f.get("bonding"):
+                out["bonding"] = f["bonding"]
+        try:
+            async with httpx.AsyncClient(timeout=5) as client:
+                r = await client.get(f"https://api.dexscreener.com/token-pairs/v1/robinhood/{ca}")
+                pairs = r.json() if r.status_code == 200 else []
+            if isinstance(pairs, list) and pairs:
+                best = max(pairs, key=lambda p: float((p.get("liquidity") or {}).get("usd") or 0))
+                if re.fullmatch(r"0x[0-9a-fA-F]{40,64}", str(best.get("pairAddress", ""))):
+                    out["pair"] = best["pairAddress"].lower()
+        except Exception:
+            pass
+        _cache["live:" + ca] = (out, time.time())
+        return out
 
     @app.get("/s/{slug}", include_in_schema=False)
     async def site_page(slug: str):
