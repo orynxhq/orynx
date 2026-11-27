@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=10">
+<link rel="stylesheet" href="/app.css?v=11">
 </head>
 <body>
 
@@ -42,6 +42,7 @@
       <a href="#how">How it works</a>
       <a href="#kit">What you get</a>
       <a href="#consult">Ask Si Dev</a>
+      <a href="#scan">Red flag scanner</a>
       <a href="#token">$ORYNX</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -217,6 +218,13 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="scan-teaser" data-page="home">
+    <div class="shell"><a class="st-card" href="#scan">
+      <span class="st-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 7.9-7 9-4-1.1-7-4.6-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 8v5M12 16.2v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      <span class="st-txt"><small>New · AI red flag scanner</small><b>Check any Robinhood Chain token before you buy</b><span>Paste a contract. We read the code, owner, pons launch and holders on-chain, and Si Dev explains the risks.</span></span>
+      <span class="st-go">Scan a token →</span></a></div>
   </section>
 
   <section class="fresh" id="fresh" data-page="home">
@@ -415,6 +423,32 @@
     </div>
   </section>
 
+  <section class="band scan" id="scan" data-page="scan">
+    <div class="shell">
+      <div class="sc-head"><span class="st-ic big"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 7.9-7 9-4-1.1-7-4.6-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 8v5M12 16.2v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div><h2>Red flag scanner</h2><p>Paste a token contract on Robinhood Chain. We read the code, the owner, the pons launch and the holder spread straight from the chain, then Si Dev tells you what it means in plain English.</p></div></div>
+      <form class="sc-form" id="scanForm" autocomplete="off">
+        <input id="scanCa" maxlength="42" placeholder="0x… token contract address" spellcheck="false" aria-label="Token contract address">
+        <button class="pill solid" id="scanGo" type="submit">Scan</button>
+      </form>
+      <div class="sc-try">Try: <button type="button" id="scanOrynx">$ORYNX</button></div>
+      <p class="sc-err" id="scanErr" role="alert"></p>
+      <div class="sc-out" id="scanOut" hidden aria-live="polite">
+        <div class="sc-top">
+          <div><small class="sc-lbl">Token</small><h3 id="scName">-</h3><code id="scAddr"></code></div>
+          <div class="sc-verdict" id="scVerdict"><b id="scScore">0</b><span id="scLevel">Low risk</span></div>
+        </div>
+        <div class="sc-take" id="scTakeBox"><small>Si Dev</small><p id="scTake"></p></div>
+        <ul class="sc-flags" id="scFlags"></ul>
+        <div class="sc-facts" id="scFacts"></div>
+        <p class="sc-miss" id="scMiss"></p>
+        <div class="sc-links"><a id="scExplorer" target="_blank" rel="noopener">View on explorer</a><a id="scPons" target="_blank" rel="noopener">Open on pons</a></div>
+        <p class="sc-note">Automated on-chain checks plus an AI summary. It can miss things and it is not financial advice. Always do your own research.</p>
+      </div>
+      <p class="sc-quota" id="scanQuota"></p>
+    </div>
+  </section>
+
   <section class="band" id="faq" data-page="faq">
     <div class="shell faq">
       <h2>Questions</h2>
@@ -443,7 +477,7 @@
         <p>Launch kits for AI projects and meme coins on Robinhood Chain.</p>
         <a class="hey-badge" href="https://heyresearch.xyz/project/orynx?utm_source=badge&amp;utm_medium=html" target="_blank" rel="noopener" style="display:inline-block;margin-top:18px"><img src="https://heyresearch.xyz/api/badge/orynx?theme=dark" alt="Orynx on HEY Research Lab" width="440" height="144" loading="lazy" style="display:block;max-width:100%;height:auto;width:340px"></a>
       </div>
-      <nav class="foot-col" aria-label="Product"><h4>Product</h4><a href="#build">Build a kit</a><a href="#consult">Ask Si Dev</a><a href="#examples">Examples</a><a href="#how">How it works</a><a href="#kit">What you get</a></nav>
+      <nav class="foot-col" aria-label="Product"><h4>Product</h4><a href="#build">Build a kit</a><a href="#consult">Ask Si Dev</a><a href="#scan">Red flag scanner</a><a href="#examples">Examples</a><a href="#how">How it works</a><a href="#kit">What you get</a></nav>
       <nav class="foot-col" aria-label="Token"><h4>$ORYNX</h4><a href="#token">Holder perks</a><a href="#hq">HQ logos</a><a href="#faq">FAQ</a></nav>
       <nav class="foot-col" aria-label="Community"><h4>Community</h4><a href="https://x.com/orynxhq" target="_blank" rel="noopener">X @orynxhq</a><a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">Launch on pons</a></nav>
     </div>
@@ -462,7 +496,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=8"></script>
+<script src="/app.js?v=9"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>

@@ -58,6 +58,9 @@ LIMIT_GLOBAL_LOGO = int(os.getenv("LIMIT_GLOBAL_LOGO", "150"))
 LIMIT_GLOBAL_CHAT = int(os.getenv("LIMIT_GLOBAL_CHAT", "800"))
 FREE_CHAT = int(os.getenv("FREE_CHAT", "8"))
 HOLDER_CHAT = int(os.getenv("HOLDER_CHAT", "60"))
+FREE_SCAN = int(os.getenv("FREE_SCAN", "5"))
+HOLDER_SCAN = int(os.getenv("HOLDER_SCAN", "40"))
+LIMIT_GLOBAL_SCAN = int(os.getenv("LIMIT_GLOBAL_SCAN", "600"))
 LIMIT_GLOBAL_REDO = int(os.getenv("LIMIT_GLOBAL_REDO", "400"))
 FREE_REDO = int(os.getenv("FREE_REDO", "5"))
 HOLDER_REDO = int(os.getenv("HOLDER_REDO", "40"))
@@ -426,16 +429,18 @@ def limit_redo(holder: bool) -> int:
 
 def check_limit(visitor: str, kind: str, holder: bool = False) -> None:
     kit, logo = limit_for(holder)
-    limit_personal = {"kit": kit, "logo": logo, "chat": limit_chat(holder), "redo": limit_redo(holder)}[kind]
-    limit_global = {"kit": LIMIT_GLOBAL_KIT, "logo": LIMIT_GLOBAL_LOGO, "chat": LIMIT_GLOBAL_CHAT, "redo": LIMIT_GLOBAL_REDO}[kind]
+    scan = HOLDER_SCAN if (GATING_ACTIVE and holder) else FREE_SCAN
+    limit_personal = {"kit": kit, "logo": logo, "chat": limit_chat(holder), "redo": limit_redo(holder), "scan": scan}[kind]
+    limit_global = {"kit": LIMIT_GLOBAL_KIT, "logo": LIMIT_GLOBAL_LOGO, "chat": LIMIT_GLOBAL_CHAT, "redo": LIMIT_GLOBAL_REDO,
+                    "scan": LIMIT_GLOBAL_SCAN}[kind]
     if usage("__ALL__", kind) >= limit_global:
         raise HTTPException(429, "The server is swamped today. Come back tomorrow \U0001f319")
     if usage(visitor, kind) >= limit_personal:
         message = {"kit": "You've used all your free launch kits for today.", "logo": "You've used all your free logos for today.",
                  "chat": "Si Dev needs a break. You've used today's free questions.",
-                 "redo": "You've used today's free rewrites."}[kind]
+                 "redo": "You've used today's free rewrites.", "scan": "You've used today's free scans."}[kind]
         if GATING_ACTIVE and not holder:
-            more = {"chat": HOLDER_CHAT, "redo": HOLDER_REDO}.get(kind, HOLDER_KIT)
+            more = {"chat": HOLDER_CHAT, "redo": HOLDER_REDO, "scan": HOLDER_SCAN}.get(kind, HOLDER_KIT)
             message += f" Hold {MIN_HOLD:,} $ORYNX to unlock {more} a day."
         raise HTTPException(429, message + " Come back tomorrow \U0001f319")
 

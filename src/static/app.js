@@ -1128,7 +1128,7 @@ $("chatToKit").onclick = () => {
   toBuild();
 };
 
-const PAGE = { examples: "examples", token: "token", burn: "token", faq: "faq", consult: "consult" };
+const PAGE = { examples: "examples", token: "token", burn: "token", faq: "faq", consult: "consult", scan: "scan" };
 const smooth = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 let pageActive = null;
 function openPage() {
@@ -1166,4 +1166,52 @@ loadRef();
 installBondCss(); loadBurn(); loadBonding(); setInterval(() => { if (!document.hidden) loadBonding(); }, 60000);
 
 loadQuota();
+// ---------- red flag scanner ----------
+(() => {
+  const form = $("scanForm"); if (!form) return;
+  const ICON = { red: "!", amber: "~", green: "✓" };
+  const LEVEL = { low: "Low risk", medium: "Medium risk", high: "High risk" };
+  const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
+  const big = (n) => n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : num(n);
+  function show(r) {
+    const f = r.facts || {};
+    $("scName").textContent = (r.name || "Unknown token") + (r.symbol ? " $" + r.symbol : "");
+    $("scAddr").textContent = r.token;
+    $("scScore").textContent = r.score;
+    $("scLevel").textContent = LEVEL[r.verdict] || r.verdict;
+    $("scVerdict").className = "sc-verdict " + r.verdict;
+    $("scTake").textContent = r.take || ""; $("scTakeBox").hidden = !r.take;
+    const ul = $("scFlags"); ul.replaceChildren();
+    (r.flags || []).forEach((x) => {
+      const li = document.createElement("li"); li.className = x.level;
+      const i = document.createElement("i"); i.textContent = ICON[x.level] || "";
+      const d = document.createElement("div"); const b = document.createElement("b"); b.textContent = x.title;
+      const p = document.createElement("p"); p.textContent = x.detail; d.append(b, p); li.append(i, d); ul.append(li);
+    });
+    const facts = [];
+    if (f.supply) facts.push(["Supply", big(f.supply)]);
+    if (f.holders) { facts.push(["Holders", num(f.holders.count)]); facts.push(["Top 10 hold", f.holders.top10.toFixed(1) + "%"]); }
+    if (f.bonding) facts.push(["pons curve", f.bonding.graduated ? "Graduated" : f.bonding.percent + "%"]);
+    if (f.age_hours != null) facts.push(["Age", f.age_hours < 48 ? f.age_hours + " h" : Math.round(f.age_hours / 24) + " days"]);
+    if ("renounced" in f) facts.push(["Owner", f.renounced ? "Renounced" : short(f.owner || "")]);
+    $("scFacts").replaceChildren(...facts.map(([k, v]) => { const d = document.createElement("div"); const s = document.createElement("small"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; d.append(s, b); return d; }));
+    $("scMiss").textContent = (f.missing || []).length ? "Couldn't check: " + f.missing.join(", ") + "." : "";
+    $("scExplorer").href = "https://robin.etherscan.io/token/" + r.token;
+    $("scPons").href = "https://ponsfamily.com/launchpad/" + r.token; $("scPons").hidden = !f.pons;
+    $("scanOut").hidden = false;
+    requestAnimationFrame(() => $("scanOut").scrollIntoView({ behavior: smooth(), block: "start" }));
+  }
+  async function run(ca) {
+    ca = (ca || "").trim();
+    $("scanErr").textContent = "";
+    if (!/^0x[0-9a-fA-F]{40}$/.test(ca)) { $("scanErr").textContent = "Paste a full contract address that starts with 0x (42 characters)."; return; }
+    const b = $("scanGo"), t = b.textContent; b.disabled = true; b.textContent = "Reading the chain…";
+    try { show(await api("/api/scan", { token: ca })); history.replaceState(null, "", "#scan"); }
+    catch (err) { $("scanErr").textContent = err.message; }
+    finally { b.disabled = false; b.textContent = t; }
+  }
+  form.addEventListener("submit", (e) => { e.preventDefault(); run($("scanCa").value); });
+  $("scanOrynx").onclick = () => { const ca = (($("caHome") && $("caHome").textContent.trim()) || "0x5f19286a65d33e7c76b2c8c07ccbd4310aefbf20"); $("scanCa").value = ca; run(ca); };
+})();
+
 }

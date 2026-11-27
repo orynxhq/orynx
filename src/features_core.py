@@ -912,3 +912,8 @@ def install(app, g):
         await _redis("DEL", f"orynx:sitelogo:{data.slug}")
         _cache.pop("site:" + data.slug, None)
         return {"ok": True}
+
+    # shared on-chain helpers for other feature layers (red flag scanner)
+    g["_chain"] = {"info_launch": _info_launch, "bonding_token": _bonding_token, "log_window": _log_window,
+                   "info_token": _info_token, "block_latest": _block_latest, "time_block": _time_block,
+                   "pad": _pad, "word": _word, "text_abi": _text_abi, "PONS_V2": PONS_V2}

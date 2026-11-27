@@ -10,6 +10,7 @@ and its install() calls the previous install() before adding its own routes:
 - site_logo.py     : the custom logo is also used on the mini website /s/<slug>
 - site_link.py     : links the /k/ launch page with the /s/ mini website
 - features.py      : entry point, HEY Research ownership verification + GitHub footer link
+- scanner.py       : AI red flag scanner for any token on Robinhood Chain
 Installed from app.py via install(app, globals()).
 """
 
@@ -106,6 +107,8 @@ def install(app, g):
         _install_storage(app, g)
     except Exception:
         pass
+    import scanner
+    scanner.install(app, g)
     try:
         _install_hey(app)
     except Exception:
