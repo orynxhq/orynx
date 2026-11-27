@@ -82,8 +82,26 @@ def _install_storage(app, g):
         return JSONResponse({"map": _storage_map[0]}, headers={"Cache-Control": "public, max-age=600"})
 
 
+BURN_PAGE = """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>$ORYNX burn tracker · Orynx</title>
+<meta name="description" content="Every $ORYNX burn, read live from the dead address on Robinhood Chain.">
+<meta property="og:type" content="website"><meta property="og:url" content="https://orynxai.xyz/burn">
+<meta property="og:title" content="$ORYNX burn tracker"><meta property="og:description" content="Every $ORYNX burn, read live from the dead address on Robinhood Chain.">
+<meta property="og:image" content="https://orynxai.xyz/og.png"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@orynxhq"><meta name="twitter:title" content="$ORYNX burn tracker">
+<meta name="twitter:description" content="Every $ORYNX burn, read live from the dead address on Robinhood Chain."><meta name="twitter:image" content="https://orynxai.xyz/og.png">
+<meta http-equiv="refresh" content="0;url=/#burn"><link rel="canonical" href="https://orynxai.xyz/burn">
+</head><body style="background:#000;color:#fff;font-family:system-ui"><p><a href="/#burn" style="color:#fff">Open the $ORYNX burn tracker</a></p>
+<script>location.replace("/#burn")</script></body></html>"""
+
+
 def install(app, g):
     result = _sb.install(app, g)
+
+    @app.get("/burn", include_in_schema=False)
+    async def burn_page():
+        return Response(BURN_PAGE, media_type="text/html; charset=utf-8", headers={"Cache-Control": "public, max-age=300"})
+
     try:
         _install_storage(app, g)
     except Exception:

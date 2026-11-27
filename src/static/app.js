@@ -952,9 +952,34 @@ async function loadBurn() {
       const a = document.createElement("a"); a.href = `https://robin.etherscan.io/tx/${b.tx}`; a.target = "_blank"; a.rel = "noopener"; a.textContent = b.tx.slice(0, 8) + "…" + b.tx.slice(-4);
       li.append(left, a); return li;
     }));
-    $("caBurn").innerHTML = `<b>${num(h.burned)} $ORYNX</b> burned so far (${h.percent.toFixed(2)}% of supply). <a href="#token">See the burn tracker</a>`;
+    drawBurnChart(h);
+    $("caBurn").innerHTML = `<b>${num(h.burned)} $ORYNX</b> burned so far (${h.percent.toFixed(2)}% of supply). <a href="#burn">See the burn tracker</a>`;
     $("caBurn").hidden = false; burnShow = true;
   } catch (_) {}
+}
+function drawBurnChart(h) {
+  const rec = (h.records || []).filter((b) => b.time && b.count > 0).slice().sort((a, b) => a.time - b.time);
+  if (rec.length < 2) return;
+  const listed = rec.reduce((n, b) => n + b.count, 0);
+  let run = Math.max(0, h.burned - listed);
+  const pts = rec.map((b) => { run += b.count; return { t: b.time, v: run, b }; });
+  const narrow = innerWidth < 600, W = narrow ? 340 : 600, H = narrow ? 200 : 220, L = narrow ? 46 : 54, R = 12, T = 14, B = 30;
+  const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, Date.now() / 1000), vmax = Math.max(h.burned, run) * 1.08;
+  const x = (t) => L + (t - t0) / (t1 - t0 || 1) * (W - L - R), y = (v) => H - B - v / vmax * (H - T - B);
+  const start = pts[0].v - pts[0].b.count;
+  let d = `M${x(t0)},${y(start)}`;
+  pts.forEach((p, i) => { d += ` L${x(p.t)},${y(i ? pts[i - 1].v : start)} L${x(p.t)},${y(p.v)}`; });
+  d += ` L${x(t1)},${y(pts[pts.length - 1].v)}`;
+  const area = `${d} L${x(t1)},${y(0)} L${x(t0)},${y(0)} Z`;
+  const short = (v) => v >= 1e6 ? (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + "M" : num(v);
+  const day = (t) => new Date(t * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const grid = [0, .5, 1].map((f) => { const v = vmax / 1.08 * f; return `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#1f1f1f"/><text class="ax" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${short(v)}</text>`; }).join("");
+  const dots = pts.map((p) => `<circle class="dot" cx="${x(p.t)}" cy="${y(p.v)}" r="5"><title>${num(p.b.count)} $ORYNX burned on ${day(p.t)}. Total ${num(p.v)}</title></circle>`).join("");
+  $("burnSvg").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Total $ORYNX burned over time, now ${num(h.burned)}">
+    <defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a2b" stop-opacity=".35"/><stop offset="1" stop-color="#ff6a2b" stop-opacity="0"/></linearGradient></defs>
+    ${grid}<path d="${area}" fill="url(#bg1)"/><path d="${d}" fill="none" stroke="#ff6a2b" stroke-width="2.5" stroke-linejoin="round"/>${dots}
+    <text class="ax" x="${L}" y="${H - 8}">${day(t0)}</text><text class="ax" x="${W - R}" y="${H - 8}" text-anchor="end">Now</text></svg>`;
+  $("burnChart").hidden = false;
 }
 function installBondCss() {
   const st = document.createElement("style"); st.textContent = ".ca-warn{margin:14px 0 0}.ca-burn{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--rule-d);line-height:1.55}.ca-card > .ca-box > p{max-width:none}"; document.head.appendChild(st);
@@ -1069,7 +1094,7 @@ $("chatToKit").onclick = () => {
   toBuild();
 };
 
-const PAGE = { examples: "examples", token: "token", faq: "faq", consult: "consult" };
+const PAGE = { examples: "examples", token: "token", burn: "token", faq: "faq", consult: "consult" };
 const smooth = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 let pageActive = null;
 function openPage() {
@@ -1087,6 +1112,7 @@ function openPage() {
   });
   pageActive = page;
   $("burn").hidden = !(page === "token" && $("burn").dataset.present);
+  if (h === "burn") { const go = () => $("burn").hidden ? setTimeout(go, 200) : $("burn").scrollIntoView({ behavior: "auto", block: "start" }); setTimeout(go, 50); return; }
   const el = page === "home" && h && h !== "home" ? $(h) : null;
   if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: swap ? "auto" : smooth(), block: h === "build" ? "center" : "start" }));
   else window.scrollTo(0, 0);

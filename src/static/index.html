@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=6">
+<link rel="stylesheet" href="/app.css?v=7">
 </head>
 <body>
 
@@ -367,6 +367,10 @@
           <p class="burn-pct" id="burnPct"></p>
           <div class="burn-bar"><i id="burnBar"></i></div>
           <p class="burn-note">Read live from the dead address on Robinhood Chain. <a id="burnDead" href="#" target="_blank" rel="noopener">View on explorer</a></p>
+          <figure class="burn-chart" id="burnChart" hidden>
+            <figcaption><span>Total burned over time</span><a href="/burn" id="burnLink">orynxai.xyz/burn</a></figcaption>
+            <div class="burn-svg" id="burnSvg"></div>
+          </figure>
         </div>
         <div><h3>Burn history</h3><ul class="burn-list" id="burnList"></ul></div>
       </div>
@@ -446,7 +450,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=6"></script>
+<script src="/app.js?v=7"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>

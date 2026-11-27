@@ -520,4 +520,13 @@
   .burn-list b{font-weight:600}
   .burn-list span{color:var(--graphite);font-size:13px}
   .burn-list a{color:var(--paper);font-size:13px}
+  .burn-chart{margin:28px 0 0;padding:18px 18px 10px;border:1px solid var(--rule-d);border-radius:18px;background:#080808}
+  .burn-chart[hidden]{display:none}
+  .burn-chart figcaption{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--graphite);margin-bottom:8px}
+  .burn-chart figcaption a{color:var(--paper)}
+  .burn-svg svg{display:block;width:100%;height:auto;overflow:visible}
+  .burn-svg .ax{font:12px var(--body,system-ui);fill:#8a8a8a}
+  .burn-svg .dot{fill:#ff6a2b;stroke:#060606;stroke-width:2}
+  .burn-svg .dot:hover{r:7}
   @media (max-width:900px){.ref,.burn-card{grid-template-columns:1fr;gap:28px}}
+  @media (max-width:600px){.burn-list li{flex-direction:column;gap:4px}.burn-list a{white-space:nowrap}}
