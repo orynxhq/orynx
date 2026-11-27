@@ -233,13 +233,14 @@ async function makeLogo(style) {
   await Promise.all(slot.map(async (k, i) => {
     const g = k.querySelector(".img");
     try {
-      const h = await api("/api/logo", { brief, style, variant: i + 1, mode: modeKit });
+      const h = await api("/api/logo", { brief, style, variant: i + 1, mode: modeKit, background: logoBg });
       const src = "data:image/png;base64," + h.png;
       const img = document.createElement("img"); img.src = src; img.alt = `Logo option ${i + 1}`;
       g.replaceChildren(img, usedMark()); g.onclick = () => pickLogo(k);
       const a = document.createElement("a");
       a.href = src; a.download = `${ticker}_${style}_${i + 1}${h.hq ? "_hq" : ""}.png`; a.textContent = h.hq ? "Download HQ PNG" : "Download PNG";
       if (h.sig) a.dataset.sig = h.sig;
+      if (h.svg) { a.dataset.svg = h.svg; a.dataset.style = style; a.dataset.bg = logoBg; }
       k.appendChild(a);
     } catch (err) {
       g.textContent = err.message;
@@ -299,6 +300,37 @@ $("ownToggle").onclick = () => {
 };
 pickMode("ai");
 document.querySelectorAll(".style").forEach((b) => b.onclick = () => { if (brief) makeLogo(b.dataset.style); });
+
+// Logo background colour: applies to the next logos, and recolours the current ones without using quota
+let logoBg = "";
+function markSwatch() {
+  document.querySelectorAll("#bgPick .swatch").forEach((b) => b.classList.toggle("on", (b.dataset.bg || "") === logoBg));
+  $("bgCustomWrap").classList.toggle("on", !!logoBg && !Array.from(document.querySelectorAll("#bgPick .swatch")).some((b) => b.dataset.bg === logoBg));
+  $("bgCustomWrap").style.setProperty("--c", logoBg || "#888");
+}
+async function recolorLogos() {
+  const links = Array.from(document.querySelectorAll("#logos .logo a")).filter((a) => a.dataset.svg);
+  if (!links.length) return;
+  $("bgPick").classList.add("busy");
+  await Promise.all(links.map(async (a) => {
+    const k = a.closest(".logo"), img = k.querySelector("img");
+    if (!a.dataset.orig) { a.dataset.orig = a.href; a.dataset.origSig = a.dataset.sig || ""; a.dataset.origSvg = a.dataset.svg; }
+    try {
+      let src, sig;
+      if (!logoBg) { src = a.dataset.orig; sig = a.dataset.origSig; a.dataset.svg = a.dataset.origSvg; }
+      else {
+        const h = await api("/api/logo/recolor", { svg: a.dataset.origSvg, background: logoBg, mode: modeKit, style: a.dataset.style || "classic" });
+        src = "data:image/png;base64," + h.png; sig = h.sig || "";
+      }
+      img.src = src; a.href = src; a.dataset.sig = sig; a.dataset.bg = logoBg;
+    } catch (_) {}
+  }));
+  $("bgPick").classList.remove("busy");
+  saveKit(); resetVideo(); makeBanner();
+}
+document.querySelectorAll("#bgPick .swatch").forEach((b) => b.onclick = () => { logoBg = b.dataset.bg || ""; markSwatch(); recolorLogos(); });
+$("bgCustom").addEventListener("change", (e) => { logoBg = e.target.value.toLowerCase(); markSwatch(); recolorLogos(); });
+markSwatch();
 
 Object.entries(LINKS).forEach(([name, url]) => {
   if (!url.startsWith("https://")) return;
@@ -373,7 +405,7 @@ function makeZip(files) {
   return new Blob([...fill, ...central, new Uint8Array(end.buffer)], { type: "application/zip" });
 }
 function logoCurrent() {
-  return Array.from(document.querySelectorAll("#logos .logo a")).map((a) => ({ src: a.href, name: a.download, hq: a.textContent.includes("HQ"), sig: a.dataset.sig || "" }));
+  return Array.from(document.querySelectorAll("#logos .logo a")).map((a) => ({ src: a.href, name: a.download, hq: a.textContent.includes("HQ"), sig: a.dataset.sig || "", svg: a.dataset.svg || "", style: a.dataset.style || "", bg: a.dataset.bg || "" }));
 }
 function saveKit() {
   if (!kitActive) return;
@@ -391,6 +423,8 @@ function installLogo(items) {
     const img = document.createElement("img"); img.src = l.src; img.alt = `Logo option ${i + 1}`; g.append(img, usedMark()); g.onclick = () => pickLogo(k);
     const a = document.createElement("a"); a.href = l.src; a.download = l.name; a.textContent = l.hq ? "Download HQ PNG" : "Download PNG";
     if (l.sig) a.dataset.sig = l.sig;
+    if (l.svg) { a.dataset.svg = l.svg; a.dataset.style = l.style || "classic"; }
+    if (l.bg) a.dataset.bg = l.bg;
     k.append(g, a); box.append(k);
   });
 }

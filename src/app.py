@@ -587,6 +587,43 @@ def polish_logo(svg: str, mode: str, style: str) -> str:
         return svg
 
 
+HEX_COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def _brightness(hexa: str) -> float:
+    rr, gg, bb = (int(hexa[i:i + 2], 16) for i in (0, 2, 4))
+    return 0.299 * rr + 0.587 * gg + 0.114 * bb
+
+
+def recolor_svg(svg: str, background: str, mode: str) -> str:
+    """Give a logo a new background colour. Shapes that used the old background colour
+    (negative-space cut-outs) follow it, and a white or black mark flips when the contrast gets too low."""
+    if not HEX_COLOR.match(background or ""):
+        return svg
+    new = background[1:].lower()
+    r = re.search(r"<rect\b[^>]*?/>", svg)
+    if not r or "512" not in r.group(0):
+        return svg
+    w = re.search(r'fill\s*=\s*"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})"', r.group(0))
+    old = (w.group(1) if w else "0a0a0a").lower()
+    if len(old) == 3:
+        old = "".join(c * 2 for c in old)
+    if old == new:
+        return svg
+    backdrop = re.sub(r'\sfill\s*=\s*"[^"]*"', "", r.group(0)).replace("<rect", f'<rect fill="#{new}"', 1)
+    rest = svg[: r.start()] + "\x00" + svg[r.end():]
+    forms = [old] + ([old[0::2]] if old[0::2] == old[1::2] else [])
+    for f in forms:
+        rest = re.sub(r'"#%s"' % f, f'"#{new}"', rest, flags=re.IGNORECASE)
+    if mode == "ai":
+        light_new, light_old = _brightness(new) > 150, _brightness(old) > 150
+        if light_new and not light_old:
+            rest = re.sub(r'(fill|stroke)\s*=\s*"(?:#fff|#ffffff|white)"', r'\1="#111111"', rest, flags=re.IGNORECASE)
+        elif light_old and not light_new:
+            rest = re.sub(r'(fill|stroke)\s*=\s*"(?:#000|#000000|black|#111|#111111)"', r'\1="#ffffff"', rest, flags=re.IGNORECASE)
+    return rest.replace("\x00", backdrop, 1)
+
+
 async def ask_ai(model: str, system: str, message: str, max_tokens: int, timeout: float = 600) -> str:
     if not client_ai:
         raise RuntimeError("ANTHROPIC_API_KEY is not set")
@@ -766,6 +803,14 @@ class LogoRequest(BaseModel):
     style: str = "classic"
     variant: int = Field(default=1, ge=1, le=4)
     mode: str = "ai"
+    background: str = Field(default="", max_length=7)
+
+
+class RecolorRequest(BaseModel):
+    svg: str = Field(min_length=20, max_length=60000)
+    background: str = Field(min_length=7, max_length=7)
+    mode: str = "ai"
+    style: str = "classic"
 
 
 SITE = os.getenv("SITE", "https://orynxai.xyz").rstrip("/")
@@ -960,7 +1005,12 @@ async def make_logo(data: LogoRequest, request: Request):
         f"Creative direction for this option: {direction}\n"
         f"This is option #{data.variant} of 2. {differs} Surprise me: avoid the first idea that comes to mind."
     )
+    background = data.background.lower() if HEX_COLOR.match(data.background or "") else ""
+    if background:
+        message += (f"\nBackground colour: use exactly {background} for the background <rect> and for any "
+                    "background-coloured cut-outs. Choose mark colours with strong contrast against it.")
     png = None
+    base = ""
     t_start = time.time()
     for _ in range(2):
         if time.time() - t_start > 30:
@@ -974,6 +1024,9 @@ async def make_logo(data: LogoRequest, request: Request):
                     svg = await fix_logo(svg, mode)
                 except Exception as err:
                     log.warning("Logo review skipped: %s", err)
+            if background:
+                svg = recolor_svg(svg, background, mode)
+            base = svg
             becomes = polish_logo(svg, mode, style)
             try:
                 await asyncio.to_thread(svg_to_png, becomes, 64)
@@ -988,7 +1041,28 @@ async def make_logo(data: LogoRequest, request: Request):
         raise HTTPException(502, "The logo came out broken. Try again \U0001f3a8 (this didn't use your quota)")
 
     add_usage(who, "logo")
-    return {"png": base64.b64encode(png).decode(), "hq": bool(GATING_ACTIVE and holder),
+    return {"png": base64.b64encode(png).decode(), "hq": bool(GATING_ACTIVE and holder), "svg": base,
+            "sig": sign_content("logo", hashlib.sha256(png).hexdigest())}
+
+
+@app.post("/api/logo/recolor")
+async def recolor_logo(data: RecolorRequest, request: Request):
+    """Change the background colour of a logo you already made. No AI call, so it doesn't use your quota."""
+    if not HEX_COLOR.match(data.background):
+        raise HTTPException(400, "Pick a colour like #1e40ff.")
+    try:
+        svg = get_svg(data.svg)
+    except ValueError:
+        raise HTTPException(400, "That logo can't be recoloured.")
+    mode = "meme" if data.mode == "meme" else "ai"
+    _, holder = await who_and_holder(request)
+    svg = recolor_svg(svg, data.background.lower(), mode)
+    try:
+        polished = polish_logo(svg, mode, data.style)
+        png = await asyncio.to_thread(svg_to_png, polished, 2048 if (GATING_ACTIVE and holder) else 1024)
+    except Exception:
+        raise HTTPException(400, "That logo can't be recoloured.")
+    return {"png": base64.b64encode(png).decode(), "hq": bool(GATING_ACTIVE and holder), "svg": svg,
             "sig": sign_content("logo", hashlib.sha256(png).hexdigest())}
 
 

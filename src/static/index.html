@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=9">
+<link rel="stylesheet" href="/app.css?v=10">
 </head>
 <body>
 
@@ -145,6 +145,18 @@
               <button class="style" data-style="pixel" type="button">Pixel</button>
               <button class="style" data-style="minimal" type="button">Minimal</button>
               <button class="style" data-style="classic" type="button">Try another</button>
+            </div>
+            <div class="bg-pick" id="bgPick" role="group" aria-label="Logo background colour">
+              <span>Background</span>
+              <button class="swatch auto" data-bg="" type="button" title="Original">Auto</button>
+              <button class="swatch" data-bg="#0a0a0a" type="button" style="--c:#0a0a0a" title="Black" aria-label="Black"></button>
+              <button class="swatch" data-bg="#f5f3ee" type="button" style="--c:#f5f3ee" title="Off-white" aria-label="Off-white"></button>
+              <button class="swatch" data-bg="#1e40ff" type="button" style="--c:#1e40ff" title="Blue" aria-label="Blue"></button>
+              <button class="swatch" data-bg="#6d28d9" type="button" style="--c:#6d28d9" title="Purple" aria-label="Purple"></button>
+              <button class="swatch" data-bg="#0f9d58" type="button" style="--c:#0f9d58" title="Green" aria-label="Green"></button>
+              <button class="swatch" data-bg="#ff6a2b" type="button" style="--c:#ff6a2b" title="Orange" aria-label="Orange"></button>
+              <button class="swatch" data-bg="#e11d74" type="button" style="--c:#e11d74" title="Pink" aria-label="Pink"></button>
+              <label class="swatch custom" id="bgCustomWrap" title="Any colour"><input type="color" id="bgCustom" value="#1e40ff" aria-label="Pick any colour"></label>
             </div>
             <p class="pick-hint" id="pickHint" hidden>Tap a logo to use it for your header, intro video and kit page.</p>
           </div>
@@ -450,7 +462,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=7"></script>
+<script src="/app.js?v=8"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>
