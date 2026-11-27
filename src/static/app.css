@@ -636,3 +636,13 @@
 .cs-pick{display:grid;gap:6px;margin-top:10px}
 .cs-pick button{text-align:left;border:1px solid var(--line,rgba(255,255,255,.14));background:rgba(255,255,255,.03);color:inherit;border-radius:10px;padding:8px 10px;font:inherit;font-size:13px;cursor:pointer}
 .cs-pick button:hover{background:rgba(255,255,255,.07)}
+
+/* name picker: the chosen name is the one the kit uses */
+.name{position:relative}
+.name span{display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0;flex:1}
+.name.on{border-color:var(--paper,#fff);box-shadow:0 0 0 1px var(--paper,#fff) inset}
+.name .nm-use{font:600 11px var(--body);font-style:normal;color:#0a0a0a;background:#fff;border-radius:999px;padding:2px 8px;margin-left:8px}
+.name .nm-copy{flex:none;border:1px solid var(--rule-d,#333);background:none;color:inherit;border-radius:999px;padding:5px 12px;font:600 12px var(--body);cursor:pointer}
+.name .nm-copy:hover{border-color:#666}
+.name.busy{opacity:.55;pointer-events:none}
+.name:focus-visible{outline:2px solid #fff;outline-offset:2px}

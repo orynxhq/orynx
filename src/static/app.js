@@ -188,18 +188,47 @@ function blockCopy(text, postX) {
 }
 
 function fill(id, ...el) { $(id).replaceChildren(...el); }
+// Names: tap one to make it the name your kit uses (share, header, video, mini site). Copy stays one tap away.
+function drawNames(kit) {
+  fill("names", ...kit.options.map((p, i) => {
+    const b = document.createElement("div");
+    b.className = "name" + (i === 0 ? " on" : ""); b.tabIndex = 0; b.setAttribute("role", "button");
+    b.setAttribute("aria-pressed", String(i === 0)); b.title = i === 0 ? "This is the name your kit uses" : "Use this name";
+    const name = document.createElement("span"); name.textContent = p.name;
+    if (i === 0) { const t = document.createElement("em"); t.className = "nm-use"; t.textContent = "In use"; name.append(t); }
+    const code = document.createElement("code"); code.textContent = "$" + p.ticker;
+    const cp = document.createElement("button"); cp.type = "button"; cp.className = "nm-copy"; cp.textContent = "Copy"; cp.setAttribute("aria-label", `Copy ${p.name}`);
+    cp.onclick = (e) => { e.stopPropagation(); copy(`${p.name} ($${p.ticker})`); cp.textContent = "Copied"; setTimeout(() => cp.textContent = "Copy", 1200); };
+    b.append(name, code, cp);
+    const go = () => { if (i > 0) pickName(i, b); };
+    b.onclick = go; b.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+    return b;
+  }));
+}
+let pickingName = false;
+async function pickName(i, el) {
+  if (pickingName || !kitActive) return;
+  const k = kitActive.kit, cur = k.options[0] || {}, want = k.options[i]; if (!want) return;
+  pickingName = true; el.classList.add("busy");
+  try {
+    let sig = kitActive.sig;
+    if (sig) {
+      const h = await api("/api/kit/pick", { mode: kitActive.mode, sig, name: cur.name || "", ticker: cur.ticker || "", tagline: k.tagline, roast: k.roast,
+        pick_name: want.name, pick_ticker: want.ticker });
+      sig = h.sig;
+    }
+    k.options = [want, ...k.options.filter((_, j) => j !== i)];
+    kitActive.sig = sig; ticker = want.ticker || ticker; kitActive.ticker = ticker;
+    if (kitActive.link) { kitActive.link = ""; $("shareRow").hidden = true; }
+    $("shareKit").disabled = false; $("shareKit").textContent = "Share to community"; $("shareKit").hidden = !galleryActive || !kitActive.sig;
+    drawNames(k); checkTicker(k.options); drawThread(); saveKit(); makeBanner();
+  } catch (err) { showError(err.message); }
+  finally { pickingName = false; el.classList.remove("busy"); }
+}
 
 function showKit(kit) {
   $("roast").textContent = kit.roast || "Fine. Idea accepted. Don't get cocky.";
-  fill("names", ...kit.options.map((p) => {
-    const b = document.createElement("button");
-    b.className = "name"; b.type = "button";
-    const name = document.createElement("span"); name.textContent = p.name;
-    const code = document.createElement("code"); code.textContent = "$" + p.ticker;
-    b.append(name, code);
-    b.onclick = () => { copy(`${p.name} ($${p.ticker})`); code.textContent = "Copied"; setTimeout(() => code.textContent = "$" + p.ticker, 1200); };
-    return b;
-  }));
+  drawNames(kit);
   $("featuresLabel").textContent = MODES[modeKit].features;
   fill("tagline", blockCopy(kit.tagline));
   fill("features", blockCopy(kit.features.map((f) => "• " + f).join("\n")));

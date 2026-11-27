@@ -1197,6 +1197,30 @@ async def redo_part(data: RedoRequest, request: Request):
             "left": max(0, limit_redo(holder) - usage(who, "redo"))}
 
 
+class PickNameRequest(BaseModel):
+    mode: str = "ai"
+    sig: str = Field(min_length=10, max_length=64)
+    name: str = Field(default="", max_length=60)
+    ticker: str = Field(default="", max_length=8)
+    tagline: str = Field(default="", max_length=120)
+    roast: str = Field(default="", max_length=2000)
+    pick_name: str = Field(min_length=1, max_length=60)
+    pick_ticker: str = Field(default="", max_length=8)
+
+
+@app.post("/api/kit/pick")
+async def pick_name(data: PickNameRequest):
+    """Make another of the kit's names the main one, so sharing and mini sites use it."""
+    mode = "meme" if data.mode == "meme" else "ai"
+    if not hmac.compare_digest(sign_content("kit", data.name, data.ticker, data.tagline, data.roast, mode), data.sig):
+        raise HTTPException(400, "Build a kit on Orynx first.")
+    name = data.pick_name.strip()[:60]
+    ticker = re.sub(r"[^A-Za-z0-9]", "", data.pick_ticker).upper()[:8]
+    if not name:
+        raise HTTPException(400, "Pick a name from your kit.")
+    return {"sig": sign_content("kit", name, ticker, data.tagline, data.roast, mode)}
+
+
 @app.post("/api/consult")
 async def consult(data: ConsultRequest, request: Request):
     if not client_ai:
