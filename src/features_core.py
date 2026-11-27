@@ -860,18 +860,24 @@ def install(app, g):
         if s["tg"]:
             soc += f'<a class="ic" href="{e(s["tg"])}" target="_blank" rel="noopener" aria-label="Telegram">{ICON_TG}</a>'
         cta = (f'<a class="btn main" href="https://ponsfamily.com/launchpad/{s["ca"]}" target="_blank" rel="noopener">Buy {e(tk) or "it"} on pons</a>'
+               f'<a class="btn" href="#verify">Check the address</a>'
                if s["ca"] else '<span class="btn main soon">Launching soon on pons</span>')
-        if s["tg"]:
+        if s["tg"] and not s["ca"]:
             cta += f'<a class="btn" href="{e(s["tg"])}" target="_blank" rel="noopener">Join the Telegram</a>'
-        if s["x"]:
+        if s["x"] and not s["ca"]:
             cta += f'<a class="btn" href="{e(s["x"])}" target="_blank" rel="noopener">Follow on X</a>'
+        follow = "".join(f'<a class="btn" href="{e(u)}" target="_blank" rel="noopener">{lbl}</a>' for u, lbl in ((s["x"], "Follow on X"), (s["tg"], "Join the Telegram")) if u)
         ca_block = ""
         if s["ca"]:
-            ca_block = (f'<div class="ca"><small>Contract address</small><code id="ca">{s["ca"]}</code><button class="copy" id="cpy" type="button">Copy</button></div>'
-                       f'<div class="bond" id="bond" hidden data-src="/s/{slug}/bonding"><div class="bond-t"><span>Bonding progress</span><b id="bp">0%</b></div>'
-                       '<div class="bar"><i id="bf"></i></div><p id="bn"></p></div>')
-        features = "".join(f'<div class="card"><span class="k">{i + 1:02d}</span><p>{e(f)}</p></div>' for i, f in enumerate(s["features"])) \
-            or f'<div class="card"><span class="k">01</span><p>{e(s["tagline"])}</p></div>'
+            c = s["ca"]
+            ca_block = (f'<section class="verify" id="verify" aria-labelledby="ver-h"><div class="v-head"><h2 id="ver-h">Check the address before you buy</h2>'
+                        f'<p>Copycats reuse names and logos. The contract below is the only real {e(tk or s["name"])}. Match the first and last characters with what your wallet shows.</p></div>'
+                        f'<div class="ca"><code id="ca" data-full="{c}"><b>{c[:6]}</b>{c[6:-4]}<b>{c[-4:]}</b></code>'
+                        f'<div class="ca-act"><button class="copy" id="cpy" type="button">Copy address</button>'
+                        f'<a class="lnk" href="https://robin.etherscan.io/token/{c}" target="_blank" rel="noopener">View on explorer</a></div></div>'
+                        f'<div class="bond" id="bond" hidden data-src="/s/{slug}/bonding"><div class="bond-t"><span>pons curve</span><b id="bp">0%</b></div>'
+                        '<div class="bar"><i id="bf"></i></div><p id="bn"></p></div></section>')
+        features = "".join(f'<li>{e(f)}</li>' for f in s["features"]) or f'<li>{e(s["tagline"])}</li>'
         steps = [("Get ETH on Robinhood Chain", "Bridge or buy a little ETH in a wallet that supports Robinhood Chain.")]
         if s["ca"]:
             steps += [("Open pons", f"Go to ponsfamily.com and find {tk or s['name']}."),
@@ -879,7 +885,7 @@ def install(app, g):
         else:
             steps += [("Follow for the launch", "The contract address will be posted here and on our socials."),
                         ("Buy on pons", f"When {tk or s['name']} goes live, buy it on ponsfamily.com.")]
-        steps_html = "".join(f'<div class="step"><b>{e(a)}</b><p>{e(b)}</p></div>' for a, b in steps)
+        steps_html = "".join(f'<li class="step"><span class="n">{i + 1}</span><b>{e(a)}</b><p>{e(b)}</p></li>' for i, (a, b) in enumerate(steps))
         n_name = max((len(k) for k in s["name"].split()), default=4) + (3 if s["theme"] == "night" else 0)
         h1 = ("clamp(56px,9.5vw,124px)" if n_name <= 6 else "clamp(46px,7.2vw,96px)" if n_name <= 9
               else "clamp(38px,5.4vw,72px)" if n_name <= 13 else "clamp(30px,4vw,54px)")
@@ -887,7 +893,9 @@ def install(app, g):
                  "URL": url, "PATH": f"/s/{slug}", "FONT_URL": t["font"], "DISP": t["disp"], "BODY": t["body"], "H1_WEIGHT": t["h1"], "H2_WEIGHT": t["h2"],
                  "H1_TRACK": t["track"], "RADIUS": t["radius"], "BW": t["bw"], "HALO": t["halo"], "LABEL_CHAIN": "Robinhood Chain",
                  "SOC": soc, "CTA": cta, "CA_BLOCK": ca_block, "DESCRIPTION": e(s["description"] or s["tagline"]),
-                 "TITLE_FEATURES": "The lore" if s["mode"] == "meme" else "What it does", "FEATURES": features, "STEPS": steps_html, **w}
+                 "TITLE_FEATURES": "The lore" if s["mode"] == "meme" else "What it does", "FEATURES": features, "STEPS": steps_html,
+                 "TICKER_BIG": e(tk or s["name"]), "BUY_HREF": f"https://ponsfamily.com/launchpad/{s['ca']}" if s["ca"] else "",
+                 "BODY_CLASS": "has-ca" if s["ca"] else "", "FOLLOW": follow, "THEME": s["theme"], **w}
         tpl = _cache.get("tpl_site")
         if not tpl:
             tpl = (g["Path"](__file__).parent / "static" / "site.html").read_text(encoding="utf-8")
