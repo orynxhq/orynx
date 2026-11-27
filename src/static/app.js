@@ -1370,6 +1370,7 @@ loadQuota();
   fetch("/api/gallery").then((r) => r.json()).then((g) => { if (g && g.items && g.items.length >= 3) build(g.items); }).catch(() => {});
   // proof strip: live numbers for $ORYNX
   const proof = $("proof");
+  if (!proof) return;
   Promise.allSettled([fetch("/api/holders").then((r) => r.json()), fetch("/api/burn").then((r) => r.json()), fetch("/api/bonding").then((r) => r.json())]).then(([h, b, c]) => {
     const cells = [];
     if (h.value && h.value.holders) cells.push([num(h.value.holders), "$ORYNX holders"]);
