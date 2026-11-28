@@ -1785,7 +1785,7 @@ window.orynxStudio = (kind) => { const b = document.querySelector(`.st-kind[data
       const r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
       const x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 500)), y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / 500));
       c.classList.remove("idle"); c.style.setProperty("--ry", (x * 38) + "deg"); c.style.setProperty("--rx", (-y * 30) + "deg");
-      c.style.setProperty("--gx", (35 + x * 25) + "%"); c.style.setProperty("--gy", (30 + y * 25) + "%"); c.style.setProperty("--sh", (60 - x * 40) + "%");
+      c.style.setProperty("--gx", (35 + x * 25) + "%"); c.style.setProperty("--gy", (30 + y * 25) + "%"); c.style.setProperty("--sh", (60 - x * 40) + "%"); const k = c.offsetWidth / 120; c.style.setProperty("--ex", (-x * 6 * k) + "px"); c.style.setProperty("--ey", (4 - y * 4) * k + "px");
     });
     clearTimeout(timer); timer = setTimeout(() => coins.forEach((c) => { c.style.removeProperty("--rx"); c.style.removeProperty("--ry"); c.classList.add("idle"); }), 2500);
   }, { passive: true });
