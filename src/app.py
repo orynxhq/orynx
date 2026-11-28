@@ -1685,7 +1685,7 @@ async def share_kit(data: ShareRequest, request: Request):
 
 
 @app.get("/api/gallery/logo/{id_item}")
-async def logo_gallery(id_item: str):
+async def logo_gallery(id_item: str, fmt: str = ""):
     if not re.fullmatch(r"[0-9a-f]{12}", id_item) or not (REDIS_URL and REDIS_TOKEN):
         raise HTTPException(404, "Not found")
     try:
@@ -1694,6 +1694,8 @@ async def logo_gallery(id_item: str):
         b64 = None
     if not b64:
         raise HTTPException(404, "Not found")
+    if fmt == "b64":
+        return RawResponse(b64, media_type="text/plain", headers={"Cache-Control": "public, max-age=86400"})
     return RawResponse(base64.b64decode(b64), media_type="image/png",
                        headers={"Cache-Control": "public, max-age=86400, s-maxage=604800, immutable"})
 
