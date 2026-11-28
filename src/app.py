@@ -866,6 +866,7 @@ class LogoRequest(BaseModel):
     mode: str = "ai"
     background: str = Field(default="", max_length=7)
     circle: bool = True
+    ticker: str = Field(default="", max_length=12)
 
 
 class RecolorRequest(BaseModel):
@@ -1040,12 +1041,132 @@ async def make_kit(data: KitRequest, request: Request):
     return {"rejected": False, "kit": tidy, "sig": sign_kit(tidy, mode_kit)}
 
 
+RULES_PIXEL = """You are a top pixel artist who draws premium icons for meme coins, the polish of a hit indie game sprite.
+Answer with ONE JSON object and nothing else:
+{"bg": "#rrggbb", "glow": "#rrggbb", "palette": {"a": "#rrggbb", ...}, "grid": ["24 characters", ... 24 rows]}
+- grid: exactly 24 rows of exactly 24 characters. "." is empty. Every other character is a key in palette.
+- The subject fills most of the grid, centred, as ONE bold readable shape. No ground, no scenery, no text outside the subject.
+- A 1-cell dark outline around the whole subject (a dark tone of the subject's own colour, not pure black).
+- Shade like a pro: every material gets a light tone (upper-left), a base tone and a shadow tone (lower-right),
+  plus 1 to 3 near-white highlight cells on the upper-left. Flat cells only, no dithering noise, no stray single pixels.
+- 6 to 10 palette colours in total. Rich, saturated, harmonious.
+- bg: a deep or bold backdrop colour that makes the subject pop. glow: a lighter tone that glows behind the subject.
+- Letters drawn in the grid must be bold (2 cells thick) and perfectly readable."""
+
+
+def pixel_svg(art: dict, background: str, circle: bool) -> str:
+    grid = [str(r) for r in art.get("grid", [])][:32]
+    palette = {str(k)[:1]: v for k, v in (art.get("palette") or {}).items() if HEX_COLOR.match(str(v))}
+    cells = [(x, y, palette[c]) for y, row in enumerate(grid) for x, c in enumerate(row[:32]) if c in palette]
+    if len(cells) < 40:
+        raise ValueError("pixel grid is empty")
+    x0 = min(c[0] for c in cells); x1 = max(c[0] for c in cells) + 1
+    y0 = min(c[1] for c in cells); y1 = max(c[1] for c in cells) + 1
+    size = max(x1 - x0, y1 - y0)
+    unit = int((560 if circle else 620) / size)
+    left = 512 - (x1 - x0) * unit // 2
+    top = 512 - (y1 - y0) * unit // 2 + (8 if circle else 0)
+    bg = background or (art.get("bg") if HEX_COLOR.match(str(art.get("bg", ""))) else "#14212b")
+    glow = art.get("glow") if HEX_COLOR.match(str(art.get("glow", ""))) else _mix(bg, "#ffffff", .35)
+    runs, by = [], {}
+    for x, y, col in cells:
+        by.setdefault(y, []).append((x, col))
+    for y, row in by.items():
+        row.sort()
+        start, prev, col0 = row[0][0], row[0][0], row[0][1]
+        for x, col in row[1:]:
+            if x == prev + 1 and col == col0:
+                prev = x
+                continue
+            runs.append((start, y, prev - start + 1, col0))
+            start, prev, col0 = x, x, col
+        runs.append((start, y, prev - start + 1, col0))
+    art_rects = "".join(f'<rect x="{left + (x - x0) * unit}" y="{top + (y - y0) * unit}" width="{w * unit}" height="{unit}" fill="{c}"/>'
+                        for x, y, w, c in runs)
+    shadow = "".join(f'<rect x="{left + (x - x0) * unit}" y="{top + (y - y0) * unit}" width="{w * unit}" height="{unit}"/>'
+                     for x, y, w, c in runs)
+    back = f'<rect width="1024" height="1024" fill="{bg}"/>'
+    if circle:
+        import math
+        back += ('<radialGradient id="pxG" cx="512" cy="512" r="430" gradientUnits="userSpaceOnUse">'
+                 f'<stop offset="0" stop-color="{glow}" stop-opacity=".75"/><stop offset=".45" stop-color="{glow}" stop-opacity=".28"/>'
+                 f'<stop offset="1" stop-color="{glow}" stop-opacity="0"/></radialGradient>'
+                 '<rect width="1024" height="1024" fill="url(#pxG)"/>')
+        dots = []
+        for r, op in ((300, .55), (385, .38), (465, .22)):
+            n = int(2 * math.pi * r / 15)
+            pts = {(round((512 + r * math.cos(2 * math.pi * i / n)) / 6) * 6, round((512 + r * math.sin(2 * math.pi * i / n)) / 6) * 6)
+                   for i in range(n)}
+            dots.append(f'<g fill="{glow}" opacity="{op}">' + "".join(f'<rect x="{a}" y="{b}" width="6" height="6"/>' for a, b in sorted(pts)) + "</g>")
+        back += "".join(dots)
+        spark = _mix(glow, "#ffffff", .7)
+        for cx, cy, k in ((780, 250, 9), (250, 330, 6), (790, 760, 6), (260, 760, 4), (700, 140, 3)):
+            back += (f'<g fill="{spark}"><rect x="{cx - k * 3}" y="{cy - k // 2}" width="{k * 6}" height="{k}"/>'
+                     f'<rect x="{cx - k // 2}" y="{cy - k * 3}" width="{k}" height="{k * 6}"/></g>')
+    vignette = ('<radialGradient id="pxV" cx="50%" cy="50%" r="72%"><stop offset=".62" stop-color="#000" stop-opacity="0"/>'
+                '<stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient><rect width="1024" height="1024" fill="url(#pxV)"/>')
+    drop = (f'<g fill="#000" opacity=".28" transform="translate(0 {unit})">{shadow}</g>')
+    spark = _mix(glow, "#ffffff", .7)
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" shape-rendering="crispEdges" '
+            f'data-px="1" data-bg="{bg}" data-glow="{glow}" data-spark="{spark}">'
+            f'{back}{vignette}{drop}{art_rects}</svg>')
+
+
+def recolor_pixel(svg: str, background: str) -> str:
+    """Swap the backdrop of a pixel logo: new background, and a glow that suits it."""
+    old = dict(re.findall(r'data-(bg|glow|spark)="(#[0-9a-fA-F]{6})"', svg))
+    glow = _mix(background, "#ffffff", .38)
+    swap = {"bg": background, "glow": glow, "spark": _mix(glow, "#ffffff", .7)}
+    head, rest = svg.split(">", 1)
+    for k in ("spark", "glow"):
+        if k in old:
+            rest = rest.replace(old[k], swap[k])
+    if "bg" in old:
+        rest = rest.replace(f'fill="{old["bg"]}"', f'fill="{background}"', 1)
+    for k, v in swap.items():
+        head = re.sub(f'data-{k}="#[0-9a-fA-F]{{6}}"', f'data-{k}="{v}"', head)
+    return head + ">" + rest
+
+
+def _mix(a: str, b: str, t: float) -> str:
+    pa = [int(a[i:i + 2], 16) for i in (1, 3, 5)]; pb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(x + (y - x) * t):02x}" for x, y in zip(pa, pb))
+
+
+def read_pixel(answer: str) -> dict:
+    m = re.search(r"\{.*\}", answer, re.S)
+    if not m:
+        raise ValueError("no JSON in pixel answer")
+    return json.loads(m.group(0))
+
+
+async def make_pixel_logo(data, background: str) -> str:
+    tick = re.sub(r"[^A-Za-z0-9]", "", data.ticker or "").upper()
+    if data.variant % 2 == 1:
+        what = ("Draw the main character's HEAD only (no body), front or three-quarter view, big expressive eyes "
+                "and one clear attitude that tells the joke. Iconic like a famous meme face.")
+    else:
+        letter = tick[:1] or "the first letter of the coin's name"
+        what = secrets.choice([
+            f"Draw a shiny coin or token, seen from the front, with a bold letter {letter} embossed in its centre.",
+            "Draw the single object or symbol that sums up the idea as a chunky, iconic item (no face).",
+            f"Draw a bold badge or shield with the letter {letter} in its centre, framed by one detail from the idea.",
+        ])
+    message = (f"Coin idea: {data.brief}\n" + (f"Ticker: ${tick}\n" if tick else "") +
+               f"What to draw: {what}\nColour mood: {secrets.choice(PALETTE_MEME)}.\n"
+               "Surprise me: avoid the first idea that comes to mind.")
+    if background:
+        message += f"\nThe backdrop will be {background}: pick subject colours with strong contrast against it."
+    answer = await ask_ai(MODEL_LOGO, RULES_PIXEL, message, 4000, timeout=60)
+    return pixel_svg(read_pixel(answer), background, data.circle)
+
+
 @app.post("/api/logo")
 async def make_logo(data: LogoRequest, request: Request):
     if not client_ai:
         raise HTTPException(503, "Orynx isn't switched on yet. Please check back soon.")
     who, holder = await who_and_holder(request)
-    if GATING_ACTIVE and not holder and data.style not in STYLE_FREE:
+    if GATING_ACTIVE and not holder and data.style not in STYLE_FREE and not (data.mode == "meme" and data.style == "pixel"):
         raise HTTPException(403, f"This logo style is for holders of {MIN_HOLD:,}+ $ORYNX.")
     check_limit(who, "logo", holder)
     mode = "meme" if data.mode == "meme" else "ai"
@@ -1086,7 +1207,15 @@ async def make_logo(data: LogoRequest, request: Request):
     png = None
     base = ""
     t_start = time.time()
-    for _ in range(2):
+    if mode == "meme" and style == "pixel":
+        for _ in range(2):
+            try:
+                base = await make_pixel_logo(data, background)
+                png = await asyncio.to_thread(svg_to_png, base, 2048 if (GATING_ACTIVE and holder) else 1024)
+                break
+            except Exception as err:
+                log.warning("Pixel logo failed: %s", err)
+    for _ in range(0 if (mode == "meme" and style == "pixel") else 2):
         if time.time() - t_start > 30:
             break
         try:
@@ -1156,9 +1285,12 @@ async def recolor_logo(data: RecolorRequest, request: Request):
         raise HTTPException(400, "That logo can't be recoloured.")
     mode = "meme" if data.mode == "meme" else "ai"
     _, holder = await who_and_holder(request)
-    svg = recolor_svg(svg, data.background.lower(), mode)
+    if 'data-px="1"' in svg[:300]:
+        svg = recolor_pixel(svg, data.background.lower())
+    else:
+        svg = recolor_svg(svg, data.background.lower(), mode)
     try:
-        polished = polish_logo(svg, mode, data.style)
+        polished = svg if 'data-px="1"' in svg[:300] else polish_logo(svg, mode, data.style)
         png = await asyncio.to_thread(svg_to_png, polished, 2048 if (GATING_ACTIVE and holder) else 1024)
     except Exception:
         raise HTTPException(400, "That logo can't be recoloured.")

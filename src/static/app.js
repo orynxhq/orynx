@@ -244,7 +244,7 @@ function showKit(kit) {
 
 function setButtonStyle(active) {
   document.querySelectorAll(".style").forEach((b) => {
-    const key = gating && !holder && b.dataset.style !== "classic" && b.dataset.style !== "nft";
+    const key = gating && !holder && b.dataset.style !== "classic" && b.dataset.style !== "nft" && !(modeKit === "meme" && b.dataset.style === "pixel");
     if (b.dataset.style === "nft") b.hidden = modeKit !== "meme";
     b.classList.toggle("locked", key);
     b.disabled = !active || key;
@@ -264,7 +264,7 @@ async function makeLogo(style) {
   await Promise.all(slot.map(async (k, i) => {
     const g = k.querySelector(".img");
     try {
-      const h = await api("/api/logo", { brief, style, variant: i + 1, mode: modeKit, background: logoBg, circle: $("circOn").checked });
+      const h = await api("/api/logo", { brief, style, variant: i + 1, mode: modeKit, background: logoBg, circle: $("circOn").checked, ticker: ticker === "logo" ? "" : ticker });
       const src = "data:image/png;base64," + h.png;
       const img = document.createElement("img"); img.src = src; img.alt = `Logo option ${i + 1}`;
       g.replaceChildren(img, usedMark()); g.onclick = () => pickLogo(k);
