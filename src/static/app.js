@@ -828,7 +828,7 @@ function showLinkKit() {
   const main = kitActive.kit.options[0] || {};
   $("shareUrl").textContent = kitActive.link.replace(/^https?:\/\//, "");
   $("shareCopy").onclick = () => copy(kitActive.link, $("shareCopy"));
-  $("shareX").href = "https://x.com/intent/post?text=" + encodeURIComponent(`${main.name || ""}${main.ticker ? " $" + main.ticker : ""}\n${kitActive.kit.tagline}\n\nmade with Orynx\n${kitActive.link}`);
+  $("shareX").href = "https://x.com/intent/post?text=" + encodeURIComponent(`${main.name || ""}${main.ticker ? " $" + main.ticker : ""}\n${kitActive.kit.tagline}\n\nmade with @orynxhq\n${kitActive.link}`);
 }
 async function checkTicker(options) {
   const note = $("tkNote"); note.hidden = true;

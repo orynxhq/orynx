@@ -1812,7 +1812,7 @@ PAGE_KIT = """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 *{{box-sizing:border-box}}body{{margin:0;min-height:100vh;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(255,255,255,.08),transparent 70%),#000;color:#fff;font:16px/1.6 "Instrument Sans",system-ui,sans-serif;display:flex;flex-direction:column}}
 a{{color:inherit}}.top{{display:flex;align-items:center;justify-content:space-between;padding:18px max(20px,4vw);border-bottom:1px solid #222}}
 .brand{{display:flex;align-items:center;gap:10px;text-decoration:none;font:15px Michroma;letter-spacing:.18em}}.brand svg{{width:26px;height:26px}}
-.pill{{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border-radius:999px;font:600 15px "Instrument Sans",sans-serif;text-decoration:none;border:1px solid #fff;cursor:pointer}}
+.pill{{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;white-space:nowrap;border-radius:999px;font:600 15px "Instrument Sans",sans-serif;text-decoration:none;border:1px solid #fff;cursor:pointer}}
 .solid{{background:#fff;color:#000}}.line{{background:none;color:#fff;border-color:#333}}.line:hover{{border-color:#fff}}
 main{{flex:1;display:grid;place-items:center;padding:40px 20px}}
 .card{{width:min(920px,100%);display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:40px;align-items:center;padding:32px;border:1px solid #262626;border-radius:28px;background:linear-gradient(140deg,rgba(255,255,255,.07),rgba(255,255,255,0) 45%),#070707;box-shadow:0 40px 140px -60px rgba(255,255,255,.35)}}
@@ -1821,13 +1821,21 @@ main{{flex:1;display:grid;place-items:center;padding:40px 20px}}
 h1{{font:400 clamp(28px,5vw,46px)/1.15 Michroma;margin:14px 0 4px;overflow-wrap:anywhere}}.tk{{font-weight:600;color:#9a9a9a;letter-spacing:.06em}}
 .tag{{font-size:22px;margin:18px 0}}.roast{{color:#9a9a9a;border-top:1px solid #222;padding-top:14px;margin:0 0 22px}}.roast b{{color:#ddd}}
 .acts{{display:flex;gap:10px;flex-wrap:wrap}}footer{{text-align:center;color:#666;font-size:13px;padding:24px}}
-@media (max-width:700px){{.card{{grid-template-columns:1fr;gap:22px;padding:22px}}.logo{{max-width:300px;margin:0 auto}}.acts .pill{{flex:1}}}}
+.pow{{padding:0 20px 8px;display:flex;justify-content:center}}
+.pow-in{{width:min(920px,100%);display:flex;align-items:center;gap:18px;padding:20px 24px;border:1px solid #262626;border-radius:22px;background:#0b0b0b}}
+.pow-in svg{{width:40px;height:40px;flex:none}}.pow-in b{{display:block;font-size:16px}}.pow-in span{{display:block;color:#9a9a9a;font-size:14px;line-height:1.5}}
+.pow-acts{{display:flex;gap:10px;margin-left:auto;flex:none}}
+@media (max-width:700px){{.card{{grid-template-columns:1fr;gap:22px;padding:22px}}.logo{{max-width:300px;margin:0 auto}}.acts .pill{{flex:1 1 auto}}
+.pow-in{{flex-wrap:wrap}}.pow-in>div:nth-child(2){{flex:1;min-width:200px}}.pow-acts{{width:100%;margin:0;flex-direction:column}}}}
 </style></head><body>
 <header class="top"><a class="brand" href="/"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#000"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg>ORYNX</a><a class="pill line" href="/#build">Build a kit</a></header>
 <main><article class="card"><div class="logo"><img src="/api/gallery/logo/{id}" alt="{name} logo"></div>
 <div><span class="chip">{kind}</span><h1>{name}</h1><div class="tk">{ticker}</div><p class="tag">{tagline}</p>{roast}
 <div class="acts"><a class="pill solid" href="/?remix={id}#build">Remix this kit</a><a class="pill line" href="/#build">Build your own</a><a class="pill line" target="_blank" rel="noopener" href="https://x.com/intent/post?text={text_x}">Share on X</a></div></div></article></main>
-<footer>Made with Orynx, launch kits for pons on Robinhood Chain. Community kit, not financial advice.</footer></body></html>"""
+<section class="pow"><div class="pow-in"><svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#0a0a0a"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg>
+<div><b>This kit was made with Orynx</b><span>One sentence in, a full launch kit out. Orynx runs on $ORYNX, live on Robinhood Chain.</span></div>
+<div class="pow-acts"><a class="pill solid" href="/?ref=kit#build">Make your own kit</a>{buy}</div></div></section>
+<footer>Community kit made with Orynx, launch kits for pons on Robinhood Chain. Not financial advice.</footer></body></html>"""
 
 
 @app.get("/k/{id_item}", response_class=HTMLResponse)
@@ -1839,12 +1847,14 @@ async def page_kit(id_item: str):
     ticker = ("$" + it["ticker"]) if it.get("ticker") else ""
     url = f"{SITE}/k/{id_item}"
     title = f"{name} {('(' + ticker + ')') if ticker else ''} · made with Orynx".replace("  ", " ")
-    text_x = f"{name} {ticker}\n{it.get('tagline', '')}\n\nmade with Orynx\n{url}"
+    text_x = f"{name} {ticker}\n{it.get('tagline', '')}\n\nmade with @orynxhq\n{url}"
+    buy = (f'<a class="pill line" href="https://ponsfamily.com/launchpad/{ORYNX_TOKEN}" target="_blank" rel="noopener">Buy $ORYNX on pons</a>'
+           if GATING_ACTIVE else "")
     roast = f'<p class="roast"><b>Si Dev:</b> {_xml(it.get("roast", ""))}</p>' if it.get("roast") else ""
     return PAGE_KIT.format(title=_xml(title), desk=_xml(it.get("tagline", "") or "A launch kit made with Orynx."), url=url, id=id_item,
                               name=_xml(name), ticker=_xml(ticker), tagline=_xml(it.get("tagline", "")), roast=roast,
                               kind="Meme coin" if it.get("mode") == "meme" else "AI project",
-                              text_x=_xml(urllib.parse.quote(text_x)))
+                              text_x=_xml(urllib.parse.quote(text_x)), buy=buy)
 
 
 @app.get("/api/version")
