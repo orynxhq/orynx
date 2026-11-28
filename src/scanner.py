@@ -169,7 +169,7 @@ def install(app, g):
                 out.append({"level": "amber", "title": "An owner still holds control", "detail": f"Owner wallet: {f['owner']}."})
         if f.get("pons"):
             b = f.get("bonding") or {}
-            note = (" It has graduated to a locked Uniswap v4 pool." if b.get("graduated")
+            note = (" It has graduated and its pool liquidity is locked." if b.get("graduated")
                     else f" Bonding curve {b['percent']}% filled." if "percent" in b else "")
             out.append({"level": "green", "title": "Launched on pons", "detail": "Created by the pons launchpad contract on Robinhood Chain." + note})
         if not f.get("powers") and not f.get("proxy") and f.get("is_token"):

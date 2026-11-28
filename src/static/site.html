@@ -243,7 +243,7 @@ footer{padding:36px 0 48px;border-top:var(--bw) solid var(--line);display:flex;f
   }
   var bd=document.getElementById('bond');
   if(bd){fetch(bd.dataset.src).then(function(r){return r.json()}).then(function(h){if(!h.present)return;bd.hidden=false;var p=Math.max(0,Math.min(100,h.percent));document.getElementById('bp').textContent=p.toFixed(1)+'%';
-    document.getElementById('bn').textContent=h.graduated?'Graduated into a locked Uniswap v4 pool.':(h.current.toFixed(3)+' of '+h.threshold.toFixed(2)+' ETH raised. At 100% it moves into a locked Uniswap v4 pool.');requestAnimationFrame(function(){document.getElementById('bf').style.width=Math.max(2,p)+'%'})}).catch(function(){})}
+    document.getElementById('bn').textContent=h.graduated?'Graduated. The pool liquidity is locked for good.':(h.current.toFixed(3)+' of '+h.threshold.toFixed(2)+' ETH raised. At 100% it graduates and the liquidity is locked.');requestAnimationFrame(function(){document.getElementById('bf').style.width=Math.max(2,p)+'%'})}).catch(function(){})}
   var shX=document.getElementById('shX');
   if(shX){shX.href='https://x.com/intent/post?text='+encodeURIComponent(document.title+'\n'+(document.querySelector('meta[name=description]')||{}).content+'\n\n'+location.href.split('#')[0]);}
   var shL=document.getElementById('shLink');
@@ -252,7 +252,7 @@ footer{padding:36px 0 48px;border-top:var(--bw) solid var(--line);display:flex;f
     if(!L.present)return;
     var st=document.getElementById('stats'),cells=[];
     if(L.holders){cells.push([L.holders.count,'holders']);cells.push([L.holders.top10+'%','held by the top 10']);cells.push([L.holders.burned+'%','burned for good']);}
-    if(L.bonding){cells.push([L.bonding.graduated?'Graduated':L.bonding.percent+'%',L.bonding.graduated?'locked Uniswap v4 pool':'of the pons curve filled']);}
+    if(L.bonding){cells.push([L.bonding.graduated?'Graduated':L.bonding.percent+'%',L.bonding.graduated?'liquidity locked':'of the pons curve filled']);}
     if(cells.length>=2){st.innerHTML='';cells.forEach(function(c){var d=document.createElement('div'),b=document.createElement('b'),sp=document.createElement('span');b.textContent=c[0];sp.textContent=c[1];d.append(b,sp);st.append(d)});st.hidden=false;}
     if(L.scan){var v=document.getElementById('verify');if(v){var box=document.createElement('div');box.className='scan';
       var pill=document.createElement('span');pill.className='pill '+L.scan.verdict;pill.textContent=({low:'Low risk',medium:'Medium risk',high:'High risk'})[L.scan.verdict]+' · '+L.scan.score+'/100';

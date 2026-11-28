@@ -640,7 +640,7 @@ def install(app, g):
             symbol = _html.escape(info["symbol"])
             if b:
                 percent = b["percent"]
-                note = "Graduated to Uniswap v4" if b["graduated"] else f'{b["current"]:.3f} of {b["threshold"]:.2f} ETH on the pons curve'
+                note = "Graduated, liquidity locked" if b["graduated"] else f'{b["current"]:.3f} of {b["threshold"]:.2f} ETH on the pons curve'
             else:
                 percent, note = 0.0, "Bonding data is loading"
             fill = (f'<div class="top"><b>{name}</b><span>{"$" + symbol if symbol else ""}</span><em>{percent:.1f}%</em></div>'
