@@ -324,7 +324,7 @@ $("walletBtn").onclick = connectWallet;
 $("ownToggle").onclick = () => {
   const openIt = $("own").hidden;
   $("own").hidden = !openIt; $("ownToggle").setAttribute("aria-expanded", String(openIt));
-  $("ownToggle").textContent = openIt ? "Let Si Dev pick the name" : "Have a name in mind?";
+  $("ownToggle").textContent = openIt ? "Let Si Dev pick the name" : "Have your own name or logo?";
   if (openIt) $("nameOwn").focus(); else { $("nameOwn").value = ""; $("tickerOwn").value = ""; }
 };
 pickMode("ai");
@@ -1411,5 +1411,49 @@ loadQuota();
     row.hidden = false;
   }).catch(() => { row.closest("section").hidden = true; });
 })();
+
+// Your own name: add it to the kit and make it the one in use
+$("ownName").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!kitActive) return;
+  const name = $("ownNm").value.trim(), tk = $("ownTk").value.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 8);
+  if (!name) { $("ownNm").focus(); return; }
+  const k = kitActive.kit;
+  const have = k.options.findIndex((o) => o.name.toLowerCase() === name.toLowerCase());
+  if (have < 0) { k.options.push({ name, ticker: tk || name.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 5) }); }
+  else if (tk) k.options[have].ticker = tk;
+  const i = have < 0 ? k.options.length - 1 : have;
+  if (i === 0) { drawNames(k); saveKit(); makeBanner(); }
+  else { const el = document.querySelectorAll("#names .name")[i] || document.createElement("div"); await pickName(i, el); }
+  $("ownNm").value = ""; $("ownTk").value = "";
+});
+
+// Your own logo: any square-ish image becomes a 1024 px PNG, signed by the server like a drawn logo
+$("upLogo").onclick = () => { if (kitActive) $("upFile").click(); };
+$("upFile").onchange = async () => {
+  const f = $("upFile").files[0]; $("upFile").value = ""; if (!f || !kitActive) return;
+  const msg = $("upMsg"); msg.hidden = false; msg.className = "up-msg"; msg.textContent = "Adding your logo...";
+  try {
+    if (f.size > 8e6) throw new Error("That image is too big. Use one under 8 MB.");
+    const url = URL.createObjectURL(f);
+    const img = await new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => no(new Error("That file could not be opened as an image.")); im.src = url; });
+    const S = 1024, c = document.createElement("canvas"); c.width = S; c.height = S;
+    const x = c.getContext("2d");
+    const w = img.naturalWidth || S, h = img.naturalHeight || S, side = Math.min(w, h);
+    if (Math.abs(w - h) / Math.max(w, h) > 0.08) { x.fillStyle = logoBg || "#0a0a0a"; x.fillRect(0, 0, S, S); const r = Math.min(S / w, S / h); x.drawImage(img, (S - w * r) / 2, (S - h * r) / 2, w * r, h * r); }
+    else x.drawImage(img, (w - side) / 2, (h - side) / 2, side, side, 0, 0, S, S);
+    URL.revokeObjectURL(url);
+    const png = c.toDataURL("image/png");
+    const h2 = await api("/api/logo/upload", { png });
+    const box = $("logos"), kc = document.createElement("div"); kc.className = "logo own";
+    const g = document.createElement("div"); g.className = "img";
+    const im = document.createElement("img"); im.src = png; im.alt = "Your logo"; g.append(im, usedMark()); g.onclick = () => pickLogo(kc);
+    const a = document.createElement("a"); a.href = png; a.download = `${(kitActive.ticker || "logo").toLowerCase()}_your_logo.png`; a.textContent = "Download PNG"; a.dataset.sig = h2.sig;
+    kc.append(g, a); box.prepend(kc);
+    kitActive.pick = 0; markOptions(); resetVideo(); makeBanner(); saveKit();
+    if (kitActive.link) { kitActive.link = ""; $("shareRow").hidden = true; $("shareKit").disabled = false; $("shareKit").textContent = "Share to community"; }
+    msg.textContent = "Your logo is in use. It is used for your header, intro video, mini site and community share.";
+  } catch (err) { msg.className = "up-msg err"; msg.textContent = err.message; }
+};
 
 }

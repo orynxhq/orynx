@@ -743,3 +743,15 @@
 @media (max-width:560px){.hero-stats{gap:0;border:1px solid var(--rule-d);border-radius:18px;overflow:hidden;background:#070707}
   .hero-stats .stat{border:0;border-radius:0;background:none;padding:14px 12px;backdrop-filter:none;-webkit-backdrop-filter:none}
   .hero-stats .stat+.stat{border-left:1px solid var(--rule-d)}.hero-stats .stat b{font-size:16px}}
+
+/* your own name and logo */
+.own-note{grid-column:1/-1;margin:2px 0 0;font-size:13px;color:var(--graphite)}
+.own-note b{color:var(--paper);font-weight:600}
+.own-name{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.own-name input{flex:1 1 160px;min-height:42px;border-radius:12px;border:1px solid var(--rule-d);background:#0b0b0b;color:#fff;padding:0 14px;font:14px var(--body)}
+.own-name input#ownTk{flex:0 1 110px;text-transform:uppercase}
+.own-name .pill{min-height:42px}
+.up-logo{border:1px dashed #555;background:none;color:var(--paper);border-radius:999px;padding:9px 16px;font:500 14px var(--body);cursor:pointer}
+.up-logo:hover{border-color:#999}
+.up-msg{margin:10px 0 0;font-size:13px;color:#4ade80}
+.up-msg.err{color:#f87171}

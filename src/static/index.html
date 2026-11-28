@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=19">
+<link rel="stylesheet" href="/app.css?v=20">
 </head>
 <body>
 
@@ -89,10 +89,11 @@
             <div class="field">
               <input id="ide" maxlength="200" placeholder="An AI agent that tracks whale wallets">
               <button id="send" class="pill solid" type="submit">Build my kit</button>
-              <button class="own-toggle" id="ownToggle" type="button" aria-expanded="false" aria-controls="own">Have a name in mind?</button>
+              <button class="own-toggle" id="ownToggle" type="button" aria-expanded="false" aria-controls="own">Have your own name or logo?</button>
               <div class="own" id="own" hidden>
                 <input id="nameOwn" maxlength="40" placeholder="Name (optional)" aria-label="Token name (optional)">
                 <input id="tickerOwn" maxlength="8" placeholder="Ticker (optional)" aria-label="Ticker (optional)">
+                <p class="own-note">Got a logo already? Build the kit, then tap <b>Upload your logo</b> under Logo.</p>
               </div>
             </div>
           </form>
@@ -139,6 +140,11 @@
           <div class="group">
             <h3>Name and ticker <span>(tap one to use it)</span><button class="redo" type="button" data-part="name" hidden>New names</button></h3>
             <div class="names" id="names"></div>
+            <form class="own-name" id="ownName" autocomplete="off">
+              <input id="ownNm" maxlength="40" placeholder="Use your own name" aria-label="Your own token name">
+              <input id="ownTk" maxlength="8" placeholder="Ticker" aria-label="Your own ticker">
+              <button class="pill line" type="submit">Use it</button>
+            </form>
             <p class="tk-note" id="tkNote" hidden></p>
           </div>
           <div class="group">
@@ -149,7 +155,10 @@
               <button class="style" data-style="pixel" type="button">Pixel</button>
               <button class="style" data-style="minimal" type="button">Minimal</button>
               <button class="style" data-style="classic" type="button">Try another</button>
+              <button class="up-logo" id="upLogo" type="button">Upload your logo</button>
+              <input id="upFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
             </div>
+            <p class="up-msg" id="upMsg" hidden></p>
             <div class="bg-pick" id="bgPick" role="group" aria-label="Logo background colour">
               <span>Background</span>
               <button class="swatch auto" data-bg="" type="button" title="Original">Auto</button>
@@ -571,7 +580,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=15"></script>
+<script src="/app.js?v=16"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>

@@ -1086,6 +1086,28 @@ async def make_logo(data: LogoRequest, request: Request):
             "sig": sign_content("logo", hashlib.sha256(png).hexdigest())}
 
 
+class LogoUpload(BaseModel):
+    png: str = Field(min_length=100, max_length=6_000_000)
+
+
+@app.post("/api/logo/upload")
+async def upload_logo(data: LogoUpload):
+    """Sign a logo the user brought themselves, so it can be shared and used on mini sites like a drawn one."""
+    raw = data.png.split(",", 1)[-1]
+    try:
+        png = base64.b64decode(raw, validate=True)
+    except Exception:
+        raise HTTPException(400, "That file is not a PNG image.")
+    if not png.startswith(b"\x89PNG\r\n\x1a\n") or png[12:16] != b"IHDR":
+        raise HTTPException(400, "That file is not a PNG image.")
+    width, height = int.from_bytes(png[16:20], "big"), int.from_bytes(png[20:24], "big")
+    if width != height or not 256 <= width <= 2048:
+        raise HTTPException(400, "The logo must be square, between 256 and 2048 px.")
+    if len(png) > 4_000_000:
+        raise HTTPException(400, "The logo file is too big. Keep it under 4 MB.")
+    return {"sig": sign_content("logo", hashlib.sha256(png).hexdigest())}
+
+
 @app.post("/api/logo/recolor")
 async def recolor_logo(data: RecolorRequest, request: Request):
     """Change the background colour of a logo you already made. No AI call, so it doesn't use your quota."""
