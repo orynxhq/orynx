@@ -883,3 +883,20 @@
 .circ-opt{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:12px;font-size:14px;cursor:pointer}
 .circ-opt input{width:18px;height:18px;accent-color:#fff;margin:0}
 .circ-opt small{flex-basis:100%;padding-left:28px;font-size:12px;color:var(--smoke)}
+
+.bond.grad{padding:20px 20px 18px;border-color:#3a3220;background:radial-gradient(120% 90% at 0% 0%,rgba(245,197,66,.10),transparent 55%),#0b0b0b}
+.gr-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.gr-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 9px;border-radius:999px;background:#f5c542;color:#151004;font-size:13px;font-weight:700}
+.gr-badge svg{width:15px;height:15px}
+.gr-sub{font-size:13px;color:#9a9a9a}
+.gr-h{margin:14px 0 14px;font:400 26px/1.15 var(--display);color:#fff}
+.gr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gr-stats div{padding:12px 12px 10px;border:1px solid #262626;border-radius:12px;background:#111}
+.gr-stats b{display:block;font:400 22px/1.1 var(--display);color:#fff;font-variant-numeric:tabular-nums}
+.gr-stats span{display:block;margin-top:4px;font-size:12px;color:#9a9a9a}
+.gr-note{margin:12px 0 0;font-size:13px;line-height:1.5;color:#b5b5b5}
+.gr-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.gr-acts .pill{font-size:14px;padding:9px 16px}
+#ca.is-grad .ca-live i{background:#f5c542;box-shadow:0 0 10px rgba(245,197,66,.8)}
+.gr-stats b,.gr-stats span{white-space:nowrap}
+@media (max-width:480px){.gr-stats{gap:6px}.gr-stats div{padding:10px 9px 9px}.gr-stats b{font-size:18px}.gr-stats span{font-size:11px}.gr-h{font-size:22px}.gr-sub{font-size:12px}}

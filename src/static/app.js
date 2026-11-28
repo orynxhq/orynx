@@ -1056,6 +1056,23 @@ function installBond() {
   const box = document.querySelector("#ca .ca-box"); if (!box) return;
   box.insertAdjacentHTML("afterbegin", '<div class="bond" id="bond" hidden><div class="bond-top"><span id="bondLbl">Bonding progress</span><b id="bondPct">0%</b></div><div class="bond-bar" role="progressbar" aria-label="Bonding progress" aria-valuemin="0" aria-valuemax="100" id="bondBar"><i id="bondFill"></i></div><p class="bond-note" id="bondNote"></p></div>');
 }
+function showGraduated(el, h) {
+  if (el.classList.contains("grad")) return;
+  el.classList.add("grad");
+  const ca = tokenCa || "0x5f19286a65d33e7c76b2c8c07ccbd4310aefbf20";
+  const eth = h.threshold ? (+h.threshold).toFixed(h.threshold % 1 ? 1 : 0) + " ETH" : "100%";
+  const share = "https://x.com/intent/post?text=" + encodeURIComponent("$ORYNX graduated on pons 🎓\n\nCurve filled, liquidity locked for good. Track it live:\norynxai.xyz");
+  el.innerHTML = `<div class="gr-top"><span class="gr-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Graduated</span><span class="gr-sub">Bonding curve complete</span></div>
+    <p class="gr-h">$ORYNX graduated on pons</p>
+    <div class="gr-stats"><div><b id="grHold">–</b><span>Holders</span></div><div><b>${eth}</b><span>Curve filled</span></div><div><b>Locked</b><span>Liquidity</span></div></div>
+    <p class="gr-note">The curve is done and the pool's liquidity is locked for good: nobody, not even the team, can pull it.</p>
+    <div class="gr-acts"><a class="pill line" href="https://dexscreener.com/robinhood/${ca}" target="_blank" rel="noopener">Live chart</a><a class="pill line" href="${share}" target="_blank" rel="noopener">Share on X</a></div>`;
+  $("ca").classList.add("is-grad");
+  const live = document.querySelector("#ca .ca-live"); if (live) live.lastChild.textContent = "$ORYNX graduated · trading live";
+  const hh = document.querySelector("#ca .ca-card h2"); if (hh) hh.textContent = "Get $ORYNX";
+  fetch("/api/holders").then((r) => r.json()).then((d) => { if (d && d.holders && $("grHold")) $("grHold").textContent = num(d.holders); }).catch(() => {});
+}
+
 let bondNow = 0;
 function numEth(x) { return x >= 1 ? x.toFixed(2) : x.toFixed(3); }
 async function loadBonding() {
@@ -1064,11 +1081,12 @@ async function loadBonding() {
     if (!h.present) return;
     installBond(); if (!$("bond")) return;
     const el = $("bond"); el.hidden = false; el.classList.toggle("done", !!h.graduated);
+    if (h.graduated) { showGraduated(el, h); return; }
     const target = Math.max(0, Math.min(100, h.percent));
     $("bondLbl").textContent = h.graduated ? "Graduated" : "Bonding progress";
     $("bondNote").textContent = h.graduated
-      ? "$ORYNX finished its bonding curve and now trades in a locked Uniswap v4 pool."
-      : `${numEth(h.current)} of ${numEth(h.threshold)} ETH raised on the pons curve. At 100% it graduates to a locked Uniswap v4 pool.`;
+      ? "$ORYNX finished its bonding curve and now trades in its locked pons pool."
+      : `${numEth(h.current)} of ${numEth(h.threshold)} ETH raised on the pons curve. At 100% it graduates and the liquidity stays locked.`;
     $("bondBar").setAttribute("aria-valuenow", target.toFixed(0));
     requestAnimationFrame(() => { $("bondFill").style.width = Math.max(1.5, target) + "%"; });
     const sender = bondNow, t_start = performance.now(), old = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1400;
@@ -1406,7 +1424,7 @@ loadQuota();
     const cells = [];
     if (h.value && h.value.holders) cells.push([num(h.value.holders), "$ORYNX holders"]);
     if (b.value && b.value.active) cells.push([b.value.percent.toFixed(2) + "%", "of supply burned"]);
-    if (c.value && c.value.present) cells.push([c.value.graduated ? "Graduated" : c.value.percent.toFixed(1) + "%", c.value.graduated ? "on Uniswap v4" : "pons curve filled"]);
+    if (c.value && c.value.present) cells.push([c.value.graduated ? "Graduated" : c.value.percent.toFixed(1) + "%", c.value.graduated ? "on pons" : "pons curve filled"]);
     if (cells.length < 2) return;
     proof.replaceChildren(...cells.map(([v, l]) => { const d = document.createElement("div"); const bb = document.createElement("b"); bb.textContent = v; const s = document.createElement("span"); s.textContent = l; d.append(bb, s); return d; }));
     proof.hidden = false;

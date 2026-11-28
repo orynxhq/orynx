@@ -82,7 +82,11 @@
     const box = $("bond"); if (!box) return false;
     let h; try { h = await api("/api/bonding"); } catch (_) { return true; }
     if (!h.present) return true;
-    const pct = h.graduated ? 100 : h.percent;
+    if (h.graduated) {
+      if (Number(read("orynx_ms") || 0) < 100) { save("orynx_ms", "100"); confetti(); }
+      return true;
+    }
+    const pct = h.percent;
     const bar = $("bondBar");
     if (bar && !bar.querySelector(".tk")) [25, 50, 75].forEach((m) => { const i = document.createElement("span"); i.className = "tk"; i.style.left = m + "%"; bar.appendChild(i); });
     let row = box.querySelector(".ms-row");
