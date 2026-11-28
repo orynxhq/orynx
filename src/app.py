@@ -387,8 +387,8 @@ STYLE_LOGO = {
     "studio": ("Premium studio mark, like the logo of a top AI or crypto startup: ONE bold, chunky solid shape in warm "
                "off-white #f3efe6 on the background #0c0b0a, built from 2 or 3 heavy pieces separated by one clean, "
                "deliberate cut or gap (a stencil-like split, a sheared slit or an offset). Soft, consistent corner "
-               "radii or perfectly sharp angles, never a mix. Optionally ONE small accent shape (a dot, chip, chevron "
-               "or tick, max 12% of the mark) in the accent colour given below. Solid fills only, no strokes thinner "
+               "radii or perfectly sharp angles, never a mix. An accent shape (a dot, chip, chevron or tick, max 12% "
+               "of the mark) ONLY when the direction below asks for one. Solid fills only, no strokes thinner "
                "than 40 px, no outlines. This style wins over the stroke and grey rules above."),
 }
 
@@ -1124,6 +1124,10 @@ def recolor_studio(svg: str, background: str) -> str:
     accent = acc.group(1) if acc else STUDIO_ACCENTS[0]
     light = _brightness(background[1:]) > 150
     svg = re.sub(r'#f3efe6' if light else r'#141210', "#141210" if light else "#f3efe6", svg, flags=re.I)
+    if 'data-tint="0"' in svg[:400]:
+        stops = (f'<stop offset="0" stop-color="{_mix(background, "#000000" if light else "#ffffff", .07)}"/>'
+                 f'<stop offset=".45" stop-color="{background}"/><stop offset="1" stop-color="{_mix(background, "#000000", .35)}"/>')
+        return re.sub(r'(<radialGradient id="stB"[^>]*>).*?(</radialGradient>)', lambda m: m.group(1) + stops + m.group(2), svg, count=1, flags=re.S)
     stops = (f'<stop offset="0" stop-color="{_mix(background, accent, .35 if light else .55)}"/>'
              f'<stop offset=".45" stop-color="{_mix(background, accent, .12)}"/><stop offset="1" stop-color="{_mix(background, "#000000", .35)}"/>')
     return re.sub(r'(<radialGradient id="stB"[^>]*>).*?(</radialGradient>)', lambda m: m.group(1) + stops + m.group(2), svg, count=1, flags=re.S)
@@ -1182,7 +1186,7 @@ STUDIO_ACCENTS = ["#f5a524", "#ff6b2c", "#e9b72a", "#ff8a3d", "#f7c948", "#4d7cf
 STUDIO_BG = "#0c0b0a"
 
 
-def studio_finish(svg: str, accent: str, circle: bool, background: str = "") -> str:
+def studio_finish(svg: str, accent: str, circle: bool, background: str = "", tint: bool = True) -> str:
     """Dress an AI-project mark the studio way: dark backdrop with a warm glow, fine grid, orbit or ring, grain."""
     import math
     body = re.search(r"<svg\b[^>]*>(.*)</svg>", svg, re.S).group(1)
@@ -1199,10 +1203,12 @@ def studio_finish(svg: str, accent: str, circle: bool, background: str = "") -> 
     if light:
         body = re.sub(r'#f3efe6', "#141210", body, flags=re.I)
     edge = _mix(base, "#000000", .35)
-    glow = _mix(base, accent, .55 if not light else .35)
+    glow = _mix(base, accent, .55 if not light else .35) if tint else _mix(base, "#ffffff" if not light else "#000000", .07)
+    mid = _mix(base, accent, .12) if tint else base
+    ring = accent if tint else ("#ffffff" if not light else "#000000")
     gx, gy = secrets.choice([(300, 200), (230, 210), (256, 230), (320, 260)])
     defs = (f'<radialGradient id="stB" gradientUnits="userSpaceOnUse" cx="{gx}" cy="{gy}" r="420">'
-            f'<stop offset="0" stop-color="{glow}"/><stop offset=".45" stop-color="{_mix(base, accent, .12)}"/>'
+            f'<stop offset="0" stop-color="{glow}"/><stop offset=".45" stop-color="{mid}"/>'
             f'<stop offset="1" stop-color="{edge}"/></radialGradient>'
             '<filter id="stN" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" '
             'numOctaves="2" seed="11"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .05 0"/></filter>'
@@ -1220,8 +1226,8 @@ def studio_finish(svg: str, accent: str, circle: bool, background: str = "") -> 
         kind = secrets.choice(["orbit", "ring"])
         if kind == "orbit":
             tilt = secrets.choice([-18, -12, 14, 20])
-            deco += (f'<defs><linearGradient id="stO" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{accent}" stop-opacity="0"/>'
-                     f'<stop offset=".35" stop-color="{accent}" stop-opacity=".9"/><stop offset=".7" stop-color="{accent}" stop-opacity="0"/></linearGradient></defs>'
+            deco += (f'<defs><linearGradient id="stO" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{ring}" stop-opacity="0"/>'
+                     f'<stop offset=".35" stop-color="{ring}" stop-opacity=".9"/><stop offset=".7" stop-color="{ring}" stop-opacity="0"/></linearGradient></defs>'
                      f'<g fill="none" transform="rotate({tilt} 256 256)">'
                      f'<ellipse cx="256" cy="256" rx="236" ry="118" stroke="{line}" stroke-opacity=".10" stroke-width="1.5"/>'
                      f'<ellipse cx="256" cy="256" rx="200" ry="150" stroke="{line}" stroke-opacity=".08" stroke-width="1.5"/>'
@@ -1229,13 +1235,13 @@ def studio_finish(svg: str, accent: str, circle: bool, background: str = "") -> 
         else:
             grid = "".join(f'<path d="M{x} 70V442" />' for x in range(96, 440, 32)) + "".join(f'<path d="M70 {y}H442" />' for y in range(96, 440, 32))
             deco += (f'<defs><clipPath id="stC"><circle cx="256" cy="256" r="186"/></clipPath></defs>'
-                     f'<g clip-path="url(#stC)" stroke="{accent}" stroke-opacity=".10" stroke-width="1">{grid}</g>'
-                     f'<circle cx="256" cy="256" r="186" fill="none" stroke="{accent}" stroke-opacity=".38" stroke-width="1.5"/>')
+                     f'<g clip-path="url(#stC)" stroke="{ring}" stroke-opacity=".10" stroke-width="1">{grid}</g>'
+                     f'<circle cx="256" cy="256" r="186" fill="none" stroke="{ring}" stroke-opacity=".38" stroke-width="1.5"/>')
     elif look == "grid":
         grid = "".join(f'<path d="M{x} 0V512" />' for x in range(32, 512, 32)) + "".join(f'<path d="M0 {y}H512" />' for y in range(32, 512, 32))
         deco += f'<g stroke="{line}" stroke-opacity=".04" stroke-width="1">{grid}</g>'
     return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-studio="1" '
-            f'data-accent="{accent}"><defs>{defs}</defs><rect width="512" height="512" fill="url(#stB)"/>{deco}'
+            f'data-accent="{accent}" data-tint="{int(tint)}"><defs>{defs}</defs><rect width="512" height="512" fill="url(#stB)"/>{deco}'
             f'<g filter="url(#stS)">{solid}</g>{body}<rect width="512" height="512" filter="url(#stN)"/></svg>')
 
 
@@ -1278,7 +1284,9 @@ async def make_logo(data: LogoRequest, request: Request):
                      if data.variant % 2 == 1 else
                      "Build an abstract symbol (no letter) from 2 or 3 heavy solid pieces: split, offset or mirrored halves "
                      "of a circle, a slanted rounded square, a chevron or a stencil form, with one clean gap between them.")
-        direction += f" Accent colour: {accent}."
+        use_accent = secrets.randbelow(2) == 0
+        direction += (f" Accent colour: {accent}. Add ONE small accent shape in it." if use_accent else
+                      " No accent shape and no other colour: the mark is only off-white #f3efe6.")
     message = (
         f"Logo concept: {data.brief}\n"
         f"Style: {list_style[style]}\n"
@@ -1320,7 +1328,8 @@ async def make_logo(data: LogoRequest, request: Request):
                 except Exception as err:
                     log.warning("Logo review skipped: %s", err)
             if mode == "ai" and style == "studio":
-                base = studio_finish(svg, accent, data.circle, background)
+                base = studio_finish(svg, accent, data.circle, background,
+                                     tint=bool(background) or secrets.randbelow(2) == 0)
                 png = await asyncio.to_thread(svg_to_png, base, 2048 if (GATING_ACTIVE and holder) else 1024)
                 break
             if background:
