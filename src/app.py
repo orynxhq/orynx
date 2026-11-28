@@ -1835,6 +1835,7 @@ h1{{font:400 clamp(28px,5vw,46px)/1.15 Michroma;margin:14px 0 4px;overflow-wrap:
 <section class="pow"><div class="pow-in"><svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#0a0a0a"/><circle cx="362.1" cy="149.9" r="34" fill="#fff"/></svg>
 <div><b>This kit was made with Orynx</b><span>One sentence in, a full launch kit out. Orynx runs on $ORYNX, live on Robinhood Chain.</span></div>
 <div class="pow-acts"><a class="pill solid" href="/?ref=kit#build">Make your own kit</a>{buy}</div></div></section>
+<script>(function(){{var L=window.__LP,b=document.getElementById("powBuy");if(b&&L&&L.r&&L.r.ca)b.remove();}})();</script>
 <footer>Community kit made with Orynx, launch kits for pons on Robinhood Chain. Not financial advice.</footer></body></html>"""
 
 
@@ -1848,7 +1849,7 @@ async def page_kit(id_item: str):
     url = f"{SITE}/k/{id_item}"
     title = f"{name} {('(' + ticker + ')') if ticker else ''} · made with Orynx".replace("  ", " ")
     text_x = f"{name} {ticker}\n{it.get('tagline', '')}\n\nmade with @orynxhq\n{url}"
-    buy = (f'<a class="pill line" href="https://ponsfamily.com/launchpad/{ORYNX_TOKEN}" target="_blank" rel="noopener">Buy $ORYNX on pons</a>'
+    buy = (f'<a class="pill line" id="powBuy" href="https://ponsfamily.com/launchpad/{ORYNX_TOKEN}" target="_blank" rel="noopener">Buy $ORYNX on pons</a>'
            if GATING_ACTIVE else "")
     roast = f'<p class="roast"><b>Si Dev:</b> {_xml(it.get("roast", ""))}</p>' if it.get("roast") else ""
     return PAGE_KIT.format(title=_xml(title), desk=_xml(it.get("tagline", "") or "A launch kit made with Orynx."), url=url, id=id_item,
