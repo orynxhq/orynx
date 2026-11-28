@@ -900,3 +900,24 @@
 #ca.is-grad .ca-live i{background:#f5c542;box-shadow:0 0 10px rgba(245,197,66,.8)}
 .gr-stats b,.gr-stats span{white-space:nowrap}
 @media (max-width:480px){.gr-stats{gap:6px}.gr-stats div{padding:10px 9px 9px}.gr-stats b{font-size:18px}.gr-stats span{font-size:11px}.gr-h{font-size:22px}.gr-sub{font-size:12px}}
+
+.idea-wall{margin-bottom:8px}
+.idea-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.idea-form input{flex:1 1 280px;min-width:0;height:48px;border-radius:999px;border:1px solid #2c2c2c;background:#000;color:#fff;padding:0 20px;font:inherit;font-size:15px}
+.idea-form input:focus{outline:none;border-color:#fff}
+.idea-kind{display:flex;border:1px solid #2c2c2c;border-radius:999px;padding:3px}
+.idea-kind button,.idea-tabs button{border:0;background:none;color:#9a9a9a;font:600 14px inherit;font-family:inherit;padding:9px 16px;border-radius:999px;cursor:pointer}
+.idea-kind button[aria-pressed="true"],.idea-tabs button[aria-selected="true"]{background:#fff;color:#000}
+.idea-msg{min-height:1.4em;margin:10px 4px 6px;font-size:14px;color:#9a9a9a}.idea-msg.err{color:#ffb4b4}.idea-msg.ok{color:#a7f3d0}
+.idea-tabs{display:inline-flex;border:1px solid #2c2c2c;border-radius:999px;padding:3px;margin-bottom:12px}
+.idea-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.idea{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #222;border-radius:18px;background:#0a0a0a}
+.idea-vote{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:56px;border-radius:14px;border:1px solid #2c2c2c;background:none;color:#fff;cursor:pointer;font:600 15px inherit;font-family:inherit;gap:2px}
+.idea-vote svg{width:16px;height:16px}.idea-vote:hover,.idea-vote.on{border-color:#fff}.idea-vote.on{background:#fff;color:#000}
+.idea-body{flex:1;min-width:0}.idea-body p{margin:0;font-size:15px;line-height:1.45;color:#eee;overflow-wrap:anywhere}
+.idea-meta{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:12px;color:#777}
+.idea-meta span{border:1px solid #2c2c2c;border-radius:999px;padding:1px 8px;color:#aaa}
+.idea-meta button{border:0;background:none;color:#666;font:inherit;cursor:pointer;padding:0}.idea-meta button:hover{color:#bbb}
+.idea-build{flex:none;font-size:13px;padding:8px 14px;min-height:0}
+.idea-empty{grid-column:1/-1;padding:18px;border:1px dashed #2c2c2c;border-radius:16px;color:#8a8a8a;text-align:center}
+@media (max-width:760px){.idea-list{grid-template-columns:1fr}.idea-form .pill{flex:1}}

@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=28">
+<link rel="stylesheet" href="/app.css?v=29">
 </head>
 <body>
 
@@ -362,6 +362,17 @@
         </div>
         <div class="ref-r"><h3>Top inviters this week</h3><ol id="refTop"><li class="ref-none">No invites yet this week. Yours could be first.</li></ol></div>
       </div>
+      <div class="com idea-wall" id="ideaWall">
+        <div class="ex-head"><div><h2>Idea wall</h2><p>Drop a coin idea in one sentence. Vote for the ones you'd launch, or tap Build it to turn any idea into a kit.</p></div></div>
+        <form class="idea-form" id="ideaForm" autocomplete="off">
+          <input id="ideaIn" maxlength="140" placeholder="A frog that only buys the dip" aria-label="Your coin idea">
+          <div class="idea-kind" role="group" aria-label="Idea type"><button type="button" data-k="meme" aria-pressed="true">Meme</button><button type="button" data-k="ai" aria-pressed="false">AI</button></div>
+          <button class="pill solid" type="submit">Post idea</button>
+        </form>
+        <p class="idea-msg" id="ideaMsg" role="status"></p>
+        <div class="idea-tabs" role="tablist"><button type="button" data-v="top" aria-selected="true">Top</button><button type="button" data-v="new" aria-selected="false">New</button></div>
+        <ol class="idea-list" id="ideaList"><li class="idea-empty">No ideas yet. Be the first on the wall.</li></ol>
+      </div>
       <div class="com" id="topWrap" hidden>
         <div class="ex-head"><div><h2>Top kits this week</h2><p>The community's favourites. Tap the heart on the kits you'd launch.</p></div></div>
         <div class="gallery" id="topGrid"></div>
@@ -640,7 +651,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=24"></script>
+<script src="/app.js?v=25"></script>
 <script src="/features.js?v=3" defer></script>
 </body>
 </html>

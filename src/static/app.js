@@ -1845,4 +1845,72 @@ window.orynxStudio = (kind) => { const b = document.querySelector(`.st-kind[data
   steps.forEach((s) => ob.observe(s));
 })();
 
+/* ---------- idea wall ---------- */
+{
+  const wall = $("ideaWall");
+  if (wall) {
+    let view = "top", data = { top: [], new: [] }, kind = "meme";
+    const voted = new Set((() => { try { return JSON.parse(localStorage.getItem("orynx_ideavotes") || "[]"); } catch (_) { return []; } })());
+    const keepVotes = () => { try { localStorage.setItem("orynx_ideavotes", JSON.stringify([...voted].slice(-300))); } catch (_) {} };
+    const msg = (t, cls) => { const m = $("ideaMsg"); m.textContent = t || ""; m.className = "idea-msg" + (cls ? " " + cls : ""); };
+    const up = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5l7 8h-4.5v6h-5v-6H5z" fill="currentColor"/></svg>';
+    function draw() {
+      const list = $("ideaList"); list.textContent = "";
+      const items = data[view] || [];
+      if (!items.length) { const li = document.createElement("li"); li.className = "idea-empty"; li.textContent = "No ideas yet. Be the first on the wall."; list.appendChild(li); return; }
+      for (const it of items) {
+        const li = document.createElement("li"); li.className = "idea";
+        const v = document.createElement("button"); v.type = "button"; v.className = "idea-vote" + (voted.has(it.id) ? " on" : "");
+        v.setAttribute("aria-label", "Vote for this idea"); v.innerHTML = up; const n = document.createElement("b"); n.textContent = it.votes; v.appendChild(n);
+        v.onclick = () => vote(it, v, n);
+        const body = document.createElement("div"); body.className = "idea-body";
+        const p = document.createElement("p"); p.textContent = it.text;
+        const meta = document.createElement("div"); meta.className = "idea-meta";
+        const k = document.createElement("span"); k.textContent = it.kind === "ai" ? "AI project" : "Meme coin";
+        const r = document.createElement("button"); r.type = "button"; r.textContent = "Report"; r.onclick = () => report(it, li);
+        meta.append(k, r); body.append(p, meta);
+        const b = document.createElement("button"); b.type = "button"; b.className = "pill line idea-build"; b.textContent = "Build it";
+        b.onclick = () => build(it);
+        li.append(v, body, b); list.appendChild(li);
+      }
+    }
+    async function load() {
+      try { const r = await fetch("/api/ideas"); const d = await r.json(); if (d && d.present) { data = d; draw(); } } catch (_) {}
+    }
+    async function vote(it, btn, n) {
+      if (voted.has(it.id)) return;
+      voted.add(it.id); keepVotes(); btn.classList.add("on"); n.textContent = it.votes + 1;
+      try { const d = await api("/api/ideas/vote", { id: it.id }); it.votes = d.votes; n.textContent = d.votes; }
+      catch (e) { voted.delete(it.id); keepVotes(); btn.classList.remove("on"); n.textContent = it.votes; msg(e.message, "err"); }
+    }
+    async function report(it, li) {
+      try { await api("/api/ideas/report", { id: it.id }); li.remove(); msg("Thanks, we'll take a look.", "ok"); } catch (_) {}
+    }
+    function build(it) {
+      if (typeof pickMode === "function") pickMode(it.kind === "ai" ? "ai" : "meme");
+      location.hash = "#build";
+      setTimeout(() => { $("ide").value = it.text; $("ide").focus(); $("form").requestSubmit(); }, 350);
+    }
+    wall.querySelectorAll(".idea-kind button").forEach((b) => b.onclick = () => {
+      kind = b.dataset.k; wall.querySelectorAll(".idea-kind button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    });
+    wall.querySelectorAll(".idea-tabs button").forEach((b) => b.onclick = () => {
+      view = b.dataset.v; wall.querySelectorAll(".idea-tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b))); draw();
+    });
+    $("ideaForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = $("ideaIn").value.trim(); if (!text) { msg("Type your idea first.", "err"); return; }
+      const btn = e.submitter || $("ideaForm").querySelector(".pill"); btn.disabled = true;
+      try {
+        const d = await api("/api/ideas", { text, kind });
+        $("ideaIn").value = ""; msg("Posted. Share it and get some votes.", "ok");
+        data.new = [d.idea, ...(data.new || [])].slice(0, 12);
+        view = "new"; wall.querySelectorAll(".idea-tabs button").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.v === "new"))); draw();
+      } catch (err) { msg(err.message, "err"); }
+      btn.disabled = false;
+    });
+    load(); setInterval(load, 60000);
+  }
+}
+
 }

@@ -109,6 +109,8 @@ def install(app, g):
         pass
     import scanner
     scanner.install(app, g)
+    import ideas
+    ideas.install(app, g)
     try:
         _install_hey(app)
     except Exception:

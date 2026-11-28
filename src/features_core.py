@@ -524,6 +524,7 @@ def install(app, g):
                         items.append(json.loads(row))
                     except Exception:
                         pass
+                items = [it for it in items if (it.get("ticker") or "").upper().lstrip("$") != "ORYNX"]
                 if not items:
                     return {"present": False}
                 seen = set(await _redis("SMEMBERS", "orynx:kotd:seen") or [])
@@ -538,6 +539,11 @@ def install(app, g):
                 await _redis("SET", f"orynx:kotd:{day}", pick, "EX", "172800")
                 await _redis("SADD", "orynx:kotd:seen", pick)
             it = await g["get_item"](pick)
+            if it and (it.get("ticker") or "").upper().lstrip("$") == "ORYNX":
+                # Orynx's own kit never takes the community spot: pick again
+                await _redis("DEL", f"orynx:kotd:{day}")
+                _cache.pop("kotd", None)
+                return await kit_today()
             if not it:
                 await _redis("DEL", f"orynx:kotd:{day}")
                 return {"present": False}
