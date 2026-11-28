@@ -874,3 +874,8 @@
   .story-card[data-step="3"] .sc-roast{opacity:.4}
 }
 @media (min-width:980px) and (prefers-reduced-motion:reduce){.story-card > *,.story .steps li{transition:none}}
+/* mobile: the coin sits on the right, level with the headline */
+@media (max-width:900px){
+  .hero-coin{float:right;margin:4px 0 6px 14px;shape-outside:circle(50%)}
+  .hero h1{margin-top:0}
+}
