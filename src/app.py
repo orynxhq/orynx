@@ -87,7 +87,7 @@ FREE_KIT = int(os.getenv("FREE_KIT", "1"))
 FREE_LOGO = int(os.getenv("FREE_LOGO", "4"))
 HOLDER_KIT = int(os.getenv("HOLDER_KIT", "10"))
 HOLDER_LOGO = int(os.getenv("HOLDER_LOGO", "40"))
-STYLE_FREE = {"classic"}
+STYLE_FREE = {"classic", "nft"}
 
 COOKIE = "orynx_wallet"
 AGE_SESSION = 7 * 24 * 3600
@@ -250,7 +250,7 @@ Canvas and format:
 
 {RULES_DESIGN}
 
-- Keep the SVG compact: under 6,000 characters in total, round coordinates to whole numbers, every element must earn its place.
+- Keep the SVG compact: under 6,000 characters in total (9,000 for the NFT style), round coordinates to whole numbers, every element must earn its place.
 - If the requested style is pixel-art, ignore the shape rules above and use only <rect> blocks
   snapped to a 32 px grid (16 x 16 cells), still centred with an empty margin.
 - Never copy an existing brand, logo or famous character.
@@ -363,12 +363,18 @@ EXAMPLE_EMBLEM = (
 )
 
 STYLE_LOGO_MEME = {
-    "classic": ("Bold flat emblem icon, like a premium sticker or token icon: a dark solid background, one big circle "
-                "behind the subject, ONE iconic subject drawn large with flat fills, ONE darker shade shape on the lower-right "
-                "of the main shape, ONE light highlight stroke on the upper-left (round line caps), and a thick #111111 outline "
-                "(stroke-width 14 to 16, round joins) around every main shape. 4 or 5 bold colours in total, no gradients, "
-                "no tiny details, nothing floating around. This style wins over the mascot rules above."),
+    "classic": ("Premium emblem icon, the finish of a top meme coin logo or a high-end sticker: ONE iconic subject drawn "
+                "large and centred with a strong, instantly readable silhouette. Flat fills with real depth: per main shape "
+                "a darker shade on the lower-right, ONE light highlight stroke on the upper-left (round caps), and a thick "
+                "#111111 outline (stroke-width 14 to 16, round joins). 4 or 5 bold colours in total, no gradients, no tiny "
+                "details, nothing floating around. Avoid plain round faces built from circles and rectangles: give the "
+                "subject a distinctive shape language. This style wins over the mascot rules above."),
     "mascot": "Iconic PFP-style mascot bust with a strong personality, like the face of a top meme coin.",
+    "nft": ("Premium NFT PFP portrait, like a blue-chip NFT collection: the character's head and shoulders in "
+            "three-quarter view, a confident expression, layered outfit or accessory that tells the joke, and painterly "
+            "cel shading: per material TWO shade tones plus ONE highlight, a coloured rim light along one edge, crisp "
+            "#111111 outlines (stroke-width 8 to 10). Solid backdrop colour. Up to 45 elements; keep it under 9,000 "
+            "characters. This style wins over the mascot rules above."),
     "pixel": "Retro pixel-art mascot made only of square <rect> blocks on a 32 px grid.",
     "minimal": "Minimal mascot icon: max 3 colours, no outline, the character reduced to a few smooth shapes, like a premium app icon.",
 }
@@ -859,6 +865,7 @@ class LogoRequest(BaseModel):
     variant: int = Field(default=1, ge=1, le=4)
     mode: str = "ai"
     background: str = Field(default="", max_length=7)
+    circle: bool = True
 
 
 class RecolorRequest(BaseModel):
@@ -1053,9 +1060,14 @@ async def make_logo(data: LogoRequest, request: Request):
     start = 0 if data.variant % 2 == 1 else half
     direction = list_direction[start + secrets.randbelow(half)]
     if mode == "meme" and style == "classic":
-        direction = ("Draw the one object that best sums up the idea as the icon (the thing, not a person)."
+        direction = ("Draw the one object or symbol that best sums up the idea as the icon (the thing, not a face)."
                      if data.variant % 2 == 1 else
-                     "Draw a simple character head that embodies the idea, front view, with one clear expression.")
+                     "Draw the main character as a bold emblem: a striking silhouette with one prop that tells the joke, "
+                     "not a plain round face.")
+    if mode == "meme":
+        direction += (" Put one big circle (a disc in a slightly lighter or darker tone than the background) behind the subject."
+                      if data.circle else
+                      " No circle, disc or ring behind the subject: it sits straight on the plain background colour.")
     if mode == "meme":
         direction += f" Colour mood: {secrets.choice(PALETTE_MEME)}."
     message = (
@@ -1065,7 +1077,8 @@ async def make_logo(data: LogoRequest, request: Request):
         f"This is option #{data.variant} of 2. {differs} Surprise me: avoid the first idea that comes to mind."
     )
     if mode == "meme" and style == "classic":
-        message += "\n\nReference for the finish only. Match this level of polish and technique, never its subject or colours:\n" + EXAMPLE_EMBLEM
+        message += ("\n\nReference for the finish only. Match this level of polish and technique, never its subject or colours"
+                    + ("" if data.circle else ", and leave out its background circle") + ":\n" + EXAMPLE_EMBLEM)
     background = data.background.lower() if HEX_COLOR.match(data.background or "") else ""
     if background:
         message += (f"\nBackground colour: use exactly {background} for the background <rect> and for any "
@@ -1077,7 +1090,7 @@ async def make_logo(data: LogoRequest, request: Request):
         if time.time() - t_start > 30:
             break
         try:
-            answer = await ask_ai(MODEL_LOGO, rules_logo, message, 12000, timeout=60)
+            answer = await ask_ai(MODEL_LOGO, rules_logo, message, 12000, timeout=90 if style == "nft" else 60)
             if "<svg" in answer.lower() and "</svg>" not in answer.lower():
                 log.warning("Logo answer cut off at %d chars", len(answer))
             elif "<svg" not in answer.lower():

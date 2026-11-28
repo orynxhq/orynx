@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=25">
+<link rel="stylesheet" href="/app.css?v=26">
 </head>
 <body>
 
@@ -156,6 +156,7 @@
             <h3>Logo <span id="logoInfo">(PNG, 1024 × 1024 · HQ 2048 for $ORYNX holders)</span></h3>
             <div class="logos" id="logos"></div>
             <div class="styles">
+              <button class="style" data-style="nft" type="button">NFT</button>
               <button class="style" data-style="mascot" type="button">Mascot</button>
               <button class="style" data-style="pixel" type="button">Pixel</button>
               <button class="style" data-style="minimal" type="button">Minimal</button>
@@ -176,6 +177,7 @@
               <button class="swatch" data-bg="#e11d74" type="button" style="--c:#e11d74" title="Pink" aria-label="Pink"></button>
               <label class="swatch custom" id="bgCustomWrap" title="Any colour"><input type="color" id="bgCustom" value="#1e40ff" aria-label="Pick any colour"></label>
             </div>
+            <label class="circ-opt" id="circOpt" hidden><input type="checkbox" id="circOn" checked><span>Circle behind the logo</span><small>Applies to the next logos you make</small></label>
             <p class="pick-hint" id="pickHint" hidden>Tap a logo to use it for your header, intro video and kit page.</p>
           </div>
           <div class="group" id="bannerGroup" hidden>
@@ -637,7 +639,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=19"></script>
+<script src="/app.js?v=20"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>
