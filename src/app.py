@@ -348,8 +348,26 @@ COLOR_LOGO = {
 }
 KIND_LOGO = {"ai": "an AI crypto project", "meme": "a meme coin"}
 
+EXAMPLE_EMBLEM = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
+    '<rect width="512" height="512" fill="#1b1410"/>'
+    '<circle cx="256" cy="268" r="190" fill="#2a1d15"/>'
+    '<path d="M120 400 V250 C120 165 182 112 256 112 C330 112 392 165 392 250 V400 Z" fill="#c2410c" stroke="#111111" stroke-width="16" stroke-linejoin="round"/>'
+    '<path d="M300 130 C352 150 392 196 392 250 V400 H330 V250 C330 200 318 162 300 130 Z" fill="#9a3412"/>'
+    '<path d="M170 400 V290 C170 238 208 204 256 204 C304 204 342 238 342 290 V400 Z" fill="#111111"/>'
+    '<path d="M256 380 C214 380 196 352 206 322 C214 298 236 290 240 262 C262 280 268 300 262 318 C276 310 282 296 284 282 C306 304 312 330 302 352 C294 370 278 380 256 380 Z" fill="#facc15"/>'
+    '<path d="M256 380 C236 380 228 364 234 348 C240 334 252 330 256 314 C268 328 274 342 270 356 C266 372 262 380 256 380 Z" fill="#fff7d6"/>'
+    '<rect x="100" y="392" width="312" height="34" rx="12" fill="#7c2d12" stroke="#111111" stroke-width="14"/>'
+    '<path d="M150 236 C160 190 196 158 236 150" fill="none" stroke="#fdba74" stroke-width="12" stroke-linecap="round"/>'
+    '</svg>'
+)
+
 STYLE_LOGO_MEME = {
-    "classic": "Bold meme coin mascot portrait with attitude, thick outline, instantly readable as a token icon.",
+    "classic": ("Bold flat emblem icon, like a premium sticker or token icon: a dark solid background, one big circle "
+                "behind the subject, ONE iconic subject drawn large with flat fills, ONE darker shade shape on the lower-right "
+                "of the main shape, ONE light highlight stroke on the upper-left (round line caps), and a thick #111111 outline "
+                "(stroke-width 14 to 16, round joins) around every main shape. 4 or 5 bold colours in total, no gradients, "
+                "no tiny details, nothing floating around. This style wins over the mascot rules above."),
     "mascot": "Iconic PFP-style mascot bust with a strong personality, like the face of a top meme coin.",
     "pixel": "Retro pixel-art mascot made only of square <rect> blocks on a 32 px grid.",
     "minimal": "Minimal mascot icon: max 3 colours, no outline, the character reduced to a few smooth shapes, like a premium app icon.",
@@ -1034,6 +1052,10 @@ async def make_logo(data: LogoRequest, request: Request):
     half = len(list_direction) // 2
     start = 0 if data.variant % 2 == 1 else half
     direction = list_direction[start + secrets.randbelow(half)]
+    if mode == "meme" and style == "classic":
+        direction = ("Draw the one object that best sums up the idea as the icon (the thing, not a person)."
+                     if data.variant % 2 == 1 else
+                     "Draw a simple character head that embodies the idea, front view, with one clear expression.")
     if mode == "meme":
         direction += f" Colour mood: {secrets.choice(PALETTE_MEME)}."
     message = (
@@ -1042,6 +1064,8 @@ async def make_logo(data: LogoRequest, request: Request):
         f"Creative direction for this option: {direction}\n"
         f"This is option #{data.variant} of 2. {differs} Surprise me: avoid the first idea that comes to mind."
     )
+    if mode == "meme" and style == "classic":
+        message += "\n\nReference for the finish only. Match this level of polish and technique, never its subject or colours:\n" + EXAMPLE_EMBLEM
     background = data.background.lower() if HEX_COLOR.match(data.background or "") else ""
     if background:
         message += (f"\nBackground colour: use exactly {background} for the background <rect> and for any "
