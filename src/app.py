@@ -586,6 +586,14 @@ def svg_to_png(svg: str, size: int = 1024) -> bytes:
     return bytes(resvg_py.svg_to_bytes(svg_string=svg, width=size, height=size))
 
 
+def shrink_png(png: bytes, size: int) -> bytes:
+    """Scale a square PNG down to size x size, using the SVG renderer we already ship."""
+    src = base64.b64encode(png).decode()
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {size} {size}">'
+           f'<image width="{size}" height="{size}" preserveAspectRatio="xMidYMid slice" xlink:href="data:image/png;base64,{src}"/></svg>')
+    return svg_to_png(svg, size)
+
+
 def _shade(rr: int, gg: int, bb: int, f: float) -> str:
     """Lighten (f > 0) or darken (f < 0) a colour."""
     if f >= 0:
@@ -844,7 +852,7 @@ class ShareRequest(BaseModel):
     roast: str = Field(default="", max_length=2000)
     mode: str = "ai"
     sig: str = Field(min_length=10, max_length=64)
-    logo: str = Field(min_length=100, max_length=900_000)
+    logo: str = Field(min_length=100, max_length=4_000_000)
     logo_sig: str = Field(min_length=10, max_length=64)
 
 
@@ -1633,6 +1641,20 @@ async def share_kit(data: ShareRequest, request: Request):
         raise HTTPException(400, "That logo doesn't look right.")
     if not png.startswith(b"\x89PNG") or not hmac.compare_digest(sign_content("logo", hashlib.sha256(png).hexdigest()), data.logo_sig):
         raise HTTPException(400, "Only logos made on Orynx can be shared.")
+    logo_store = data.logo
+    if len(logo_store) > 700_000:
+        # big HQ or textured logos: keep a lighter copy for the gallery, the store caps one value at about 1 MB
+        try:
+            for size in (768, 512):
+                small = await asyncio.to_thread(shrink_png, png, size)
+                logo_store = base64.b64encode(small).decode()
+                if len(logo_store) <= 700_000:
+                    break
+        except Exception as err:
+            log.warning("Shrinking a shared logo failed: %s", err)
+            raise HTTPException(400, "That logo is too big to share. Try another logo.")
+        if len(logo_store) > 900_000:
+            raise HTTPException(400, "That logo is too big to share. Try another logo.")
     who = id_visitor(request)
     try:
         already = await _redis("SET", f"orynx:shared:{data.sig}", "1", "NX", "EX", "2592000")
@@ -1649,7 +1671,7 @@ async def share_kit(data: ShareRequest, request: Request):
         await _redis("SET", f"orynx:sharedid:{data.sig}", id_item, "EX", "2592000")
         item = {"id": id_item, "name": data.name, "ticker": data.ticker, "tagline": data.tagline,
                 "roast": data.roast, "mode": mode, "t": int(time.time())}
-        await _redis("SET", f"orynx:logo:{id_item}", data.logo)
+        await _redis("SET", f"orynx:logo:{id_item}", logo_store)
         await _redis("SET", f"orynx:item:{id_item}", json.dumps(item))
         await _redis("LPUSH", "orynx:gallery", json.dumps(item))
         await _redis("LTRIM", "orynx:gallery", "0", "299")
