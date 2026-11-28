@@ -1341,45 +1341,61 @@ loadQuota();
   $("scanOrynx").onclick = () => { const ca = (($("caHome") && $("caHome").textContent.trim()) || "0x5f19286a65d33e7c76b2c8c07ccbd4310aefbf20"); $("scanCa").value = ca; run(ca); };
 })();
 
-// ---------- hero deck: real kits from the community, one at a time ----------
+// ---------- hero live demo: an idea is typed, Si Dev builds the kit card in front of you ----------
 (() => {
   const deck = $("deck"); if (!deck) return;
+  const svg = (x) => "data:image/svg+xml;utf8," + encodeURIComponent(x);
   const SAMPLE = [
-    { name: "Ledgerline", ticker: "LDGR", mode: "ai", tagline: "An AI analyst that reads every wallet move so you don't have to.", logo: "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a"/><rect x="136" y="136" width="240" height="240" rx="56" fill="none" stroke="#fff" stroke-width="40"/><path d="M196 300l50-60 40 36 50-70" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/></svg>') },
-    { name: "Kiln", ticker: "KILN", mode: "meme", tagline: "Memes go in raw. They come out fired.", logo: "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1b1410"/><path d="M120 400V250C120 165 182 112 256 112s136 53 136 138v150z" fill="#c2410c" stroke="#111" stroke-width="16"/><path d="M170 400V290c0-52 38-86 86-86s86 34 86 86v110z" fill="#111"/><path d="M256 380c-42 0-60-28-50-58 8-24 30-32 34-60 22 18 28 38 22 56 14-8 20-22 22-36 22 22 28 48 18 70-8 18-24 28-46 28z" fill="#facc15"/></svg>') },
-    { name: "Signalnest", ticker: "NEST", mode: "ai", tagline: "Your trading copilot for tokenized stocks, awake 24/7.", logo: "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a"/><circle cx="256" cy="256" r="46" fill="#fff"/><path d="M160 256a96 96 0 0 1 192 0M110 256a146 146 0 0 1 292 0" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round"/></svg>') },
+    { name: "Kiln", ticker: "KILN", mode: "meme", idea: "A furnace that fires raw memes into finished ones", tagline: "Memes go in raw. They come out fired.", logo: "/demo/kiln.png" },
+    { name: "Ledgerline", ticker: "LDGR", mode: "ai", idea: "An AI that reads every wallet move for you", tagline: "An AI analyst that reads every wallet move so you don't have to.", logo: svg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a"/><rect x="136" y="136" width="240" height="240" rx="56" fill="none" stroke="#fff" stroke-width="40"/><path d="M196 300l50-60 40 36 50-70" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/></svg>') },
+    { name: "Signalnest", ticker: "NEST", mode: "ai", idea: "A copilot for trading tokenized stocks 24/7", tagline: "Your trading copilot for tokenized stocks, awake 24/7.", logo: svg('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a"/><circle cx="256" cy="256" r="46" fill="#fff"/><path d="M160 256a96 96 0 0 1 192 0M110 256a146 146 0 0 1 292 0" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round"/></svg>') },
   ];
-  let cards = [], timer = 0;
-  function card(it, real) {
-    const a = document.createElement(real ? "a" : "div"); a.className = "kc"; if (real) a.href = `/k/${it.id}`;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let cards = [], items = SAMPLE, run = 0;
+  function card(it) {
+    const a = document.createElement("div"); a.className = "kc";
     const tp = document.createElement("span"); tp.className = "kc-type"; tp.textContent = it.mode === "meme" ? "Meme coin" : "AI project";
+    const busy = document.createElement("span"); busy.className = "kc-busy"; busy.textContent = "Si Dev is building...";
     const top = document.createElement("div"); top.className = "kc-top";
-    const img = document.createElement("img"); img.alt = ""; img.src = real ? `/api/gallery/logo/${it.id}` : it.logo;
-    const nm = document.createElement("div"); const b = document.createElement("b"); b.textContent = it.name; const c = document.createElement("code"); c.textContent = it.ticker ? "$" + it.ticker : "";
-    nm.append(b, c); top.append(img, nm);
-    const tag = document.createElement("p"); tag.className = "kc-tag"; tag.textContent = it.tagline || "";
+    const img = document.createElement("img"); img.alt = ""; img.src = it.logo; img.width = 72; img.height = 72;
+    const nm = document.createElement("div"); const b = document.createElement("b"); b.dataset.full = it.name; b.textContent = it.name;
+    const c = document.createElement("code"); c.textContent = "$" + it.ticker; nm.append(b, c); top.append(img, nm);
+    const tag = document.createElement("p"); tag.className = "kc-tag"; tag.dataset.full = it.tagline; tag.textContent = it.tagline;
     const parts = document.createElement("div"); parts.className = "kc-parts";
-    ["Name", "Logo", "Tagline", "Story", "X posts", "Mini site"].forEach((t) => { const s = document.createElement("span"); s.textContent = t; parts.append(s); });
-    const src = document.createElement("span"); src.className = "kc-src"; src.textContent = real ? "Built by the community on Orynx" : "Example kit";
-    a.append(tp, top, tag, parts, src);
+    ["Name", "Logo", "Tagline", "Story", "X posts", "Mini site"].forEach((t, i) => { const s = document.createElement("span"); s.textContent = t; s.style.transitionDelay = (i * 0.07) + "s"; parts.append(s); });
+    const src = document.createElement("span"); src.className = "kc-src"; src.textContent = "Example kit, made with Orynx";
+    a.append(tp, busy, top, tag, parts, src);
     return a;
   }
-  function place() { cards.forEach((c, i) => { c.dataset.pos = i < 3 ? String(i) : "2"; c.style.visibility = i < 3 ? "visible" : "hidden"; c.setAttribute("aria-hidden", String(i !== 0)); c.tabIndex = i === 0 ? 0 : -1; }); }
-  function next() {
-    if (cards.length < 2 || document.hidden) return;
-    const first = cards[0]; first.dataset.pos = "out";
-    setTimeout(() => { cards.push(cards.shift()); place(); }, 650);
+  function place() { cards.forEach((c, i) => { c.dataset.pos = i < 3 ? String(i) : "2"; c.style.visibility = i < 3 ? "visible" : "hidden"; }); }
+  const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
+  async function type(el, text, ms, id) { for (let i = 1; i <= text.length; i++) { if (id !== run) return; el.textContent = text.slice(0, i); await wait(ms); } }
+  async function cycle(id) {
+    while (id === run) {
+      const front = cards[0], it = items[0];
+      $("diKind").textContent = it.mode === "meme" ? "Meme coin" : "AI project";
+      $("demoIdea").classList.remove("go"); $("diText").textContent = "";
+      front.classList.add("building");
+      const nm = front.querySelector(".kc-top b"), tg = front.querySelector(".kc-tag");
+      nm.textContent = ""; tg.textContent = "";
+      if (document.hidden) { await wait(800); continue; }
+      await type($("diText"), it.idea, 38, id); if (id !== run) return;
+      await wait(250); $("demoIdea").classList.add("go"); await wait(700);
+      front.classList.remove("building");
+      await type(nm, nm.dataset.full, 55, id); await type(tg, tg.dataset.full, 22, id); if (id !== run) return;
+      await wait(2600); if (id !== run) return;
+      front.dataset.pos = "out"; await wait(650);
+      cards.push(cards.shift()); items.push(items.shift()); place();
+    }
   }
-  function build(items) {
-    const real = (items || []).filter((it) => it && it.id && it.name).slice(0, 6);
-    const list = real.length >= 3 ? real.map((it) => card(it, true)) : SAMPLE.map((it) => card(it, false));
-    deck.replaceChildren(...list.slice().reverse()); cards = list; place();
-    clearInterval(timer);
-    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(next, 3800);
+  function build() {
+    run++; cards = items.map((it) => card(it));
+    deck.replaceChildren(...cards.slice().reverse()); place();
+    if (still) { cards.forEach((c) => c.classList.remove("building")); $("diText").textContent = items[0].idea; return; }
+    cycle(run);
   }
-  window.orynxDeck = build;
-  build([]);
-  fetch("/api/gallery").then((r) => r.json()).then((g) => { if (g && g.items && g.items.length >= 3) build(g.items); }).catch(() => {});
+  window.orynxDeck = () => {};
+  build();
   // proof strip: live numbers for $ORYNX
   const proof = $("proof");
   if (!proof) return;
@@ -1756,5 +1772,56 @@ async function studioMake() {
 $("stMake").onclick = studioMake;
 studioFields();
 window.orynxStudio = (kind) => { const b = document.querySelector(`.st-kind[data-kind="${kind}"]`); if (b) b.click(); };
+
+// ---------- 3D coin: follows the pointer, rests in a slow sway ----------
+(() => {
+  const coins = Array.from(document.querySelectorAll(".coin3d")); if (!coins.length) return;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  coins.forEach((c) => c.classList.add("idle"));
+  if (still) { coins.forEach((c) => c.classList.remove("idle")); return; }
+  let timer = 0;
+  window.addEventListener("pointermove", (e) => {
+    coins.forEach((c) => {
+      const r = c.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+      const x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / 500)), y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / 500));
+      c.classList.remove("idle"); c.style.setProperty("--ry", (x * 38) + "deg"); c.style.setProperty("--rx", (-y * 30) + "deg");
+      c.style.setProperty("--gx", (35 + x * 25) + "%"); c.style.setProperty("--gy", (30 + y * 25) + "%"); c.style.setProperty("--sh", (60 - x * 40) + "%");
+    });
+    clearTimeout(timer); timer = setTimeout(() => coins.forEach((c) => { c.style.removeProperty("--rx"); c.style.removeProperty("--ry"); c.classList.add("idle"); }), 2500);
+  }, { passive: true });
+})();
+
+// ---------- before / after slider ----------
+(() => {
+  const box = $("baBox"), rg = $("baRange"); if (!box || !rg) return;
+  const set = (v) => box.style.setProperty("--p", v + "%");
+  rg.addEventListener("input", () => set(rg.value));
+  set(rg.value);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+  let shown = false;
+  new IntersectionObserver((es, ob) => {
+    if (shown || !es[0].isIntersecting) return; shown = true; ob.disconnect();
+    const keys = [[0, 50], [700, 78], [1500, 28], [2300, 50]], t0 = performance.now();
+    const step = (now) => {
+      const t = now - t0; let i = 0; while (i < keys.length - 2 && t > keys[i + 1][0]) i++;
+      const [ta, va] = keys[i], [tb, vb] = keys[i + 1], k = Math.min(1, (t - ta) / (tb - ta)), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      const v = va + (vb - va) * e; set(v); rg.value = v;
+      if (t < keys[keys.length - 1][0]) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, { threshold: 0.5 }).observe(box);
+})();
+
+// ---------- How it works: the kit card fills in as you scroll (desktop) ----------
+(() => {
+  const card = $("storyCard"), steps = Array.from(document.querySelectorAll("#storySteps > li"));
+  if (!card || !steps.length || !("IntersectionObserver" in window)) return;
+  steps[0].classList.add("on");
+  const ob = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return;
+    const i = steps.indexOf(e.target); steps.forEach((s, j) => s.classList.toggle("on", j === i)); card.dataset.step = String(i + 1);
+  }), { rootMargin: "-45% 0px -45% 0px" });
+  steps.forEach((s) => ob.observe(s));
+})();
 
 }

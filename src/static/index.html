@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=21">
+<link rel="stylesheet" href="/app.css?v=22">
 </head>
 <body>
 
@@ -76,6 +76,11 @@
 
     <div class="shell">
       <div>
+        <div class="hero-coin rise d1"><div class="coin3d sm" id="coinHero" aria-hidden="true"><div class="c3-body">
+  <div class="c3-face c3-front"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#111" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#d9d9d9"/><circle cx="362.1" cy="149.9" r="34" fill="#111"/></svg></div>
+  <div class="c3-edge"><i style="--z:-8"></i><i style="--z:-7"></i><i style="--z:-6"></i><i style="--z:-5"></i><i style="--z:-4"></i><i style="--z:-3"></i><i style="--z:-2"></i><i style="--z:-1"></i><i style="--z:0"></i><i style="--z:1"></i><i style="--z:2"></i><i style="--z:3"></i><i style="--z:4"></i><i style="--z:5"></i><i style="--z:6"></i><i style="--z:7"></i><i style="--z:8"></i></div>
+  <div class="c3-face c3-back"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#111" stroke-width="54"/><circle cx="362.1" cy="149.9" r="34" fill="#111"/></svg></div>
+</div><div class="c3-shadow"></div></div></div>
         <h1 class="rise d1">Your token, launch‑ready in thirty seconds.</h1>
         <p class="lede rise d2">AI project or meme coin, drop the idea. {{NAME_BOT}}, our resident AI dev, roasts it, then builds the kit: <b>name, ticker, logo, tagline, story and your first posts</b>, ready for <a href="https://www.ponsfamily.com/launchpad" target="_blank" rel="noopener">pons</a> on Robinhood Chain.</p>
 
@@ -110,7 +115,8 @@
       </div>
 
       <div class="hero-side rise d4">
-        <div class="deck" id="deck" aria-label="Kits built on Orynx"></div>
+        <div class="demo-idea" id="demoIdea" aria-hidden="true"><span class="di-k" id="diKind">Meme coin</span><span class="di-t" id="diText"></span><i class="di-c"></i><span class="di-go" id="diGo">Build my kit</span></div>
+        <div class="deck" id="deck" aria-label="Example kits built on Orynx"></div>
         <div class="hero-stats">
           <div class="stat"><b>~30 sec</b><span>from idea to a full kit</span></div>
           <div class="stat"><b>7 assets</b><span>names, logos, copy and posts</span></div>
@@ -249,6 +255,30 @@
       <span class="st-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 7.9-7 9-4-1.1-7-4.6-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 8v5M12 16.2v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
       <span class="st-txt"><small>New · AI red flag scanner</small><b>Check any Robinhood Chain token before you buy</b><span>Paste a contract. We read the code, owner, pons launch and holders on-chain, and Si Dev explains the risks.</span></span>
       <span class="st-go">Scan a token →</span></a></div>
+  </section>
+
+  <section class="band ba" data-page="home" aria-labelledby="ba-h">
+    <div class="shell">
+      <div class="ba-head"><h2 id="ba-h">From one sentence to launch day</h2><p>Drag the line to see what Orynx builds from a single idea.</p></div>
+      <div class="ba-box" id="baBox">
+        <div class="ba-before">
+          <div class="ba-note"><span class="ba-tag">Meme coin</span><p>“A furnace that fires raw memes into finished ones.”</p><small>That's all you type.</small></div>
+        </div>
+        <div class="ba-after" id="baAfter">
+          <div class="ba-grid">
+            <div class="ba-id"><img src="/demo/kiln.png" alt="" width="96" height="96" loading="lazy"><div><b>Kiln</b><code>$KILN</code></div></div>
+            <p class="ba-tagline">Memes go in raw. They come out fired.</p>
+            <div class="ba-head-x"><img src="/demo/kiln.png" alt="" loading="lazy"><div><b>Kiln</b><span>Memes go in raw. They come out fired.</span></div></div>
+            <div class="ba-post"><b>Kiln <em>@kilnfire</em></b><p>Drop your rawest meme in. The best ones come out fired, and every round burns supply.</p></div>
+            <img class="ba-site" src="/demo/kiln-site.jpg" alt="" loading="lazy">
+            <ul class="ba-list"><li>Name and ticker</li><li>Logo</li><li>X header</li><li>Story and posts</li><li>Launch thread</li><li>Mini site</li></ul>
+          </div>
+        </div>
+        <div class="ba-handle" id="baHandle" aria-hidden="true"><span></span></div>
+        <input class="ba-range" id="baRange" type="range" min="0" max="100" value="50" aria-label="Show more of the finished kit">
+        <span class="ba-lb l">Before</span><span class="ba-lb r">After</span>
+      </div>
+    </div>
   </section>
 
   <section class="band usage" data-page="home" aria-labelledby="usage-h">
@@ -409,7 +439,8 @@
     <div class="shell">
       <h2>How it works</h2>
       <p class="intro muted">Three steps from a rough idea to everything you need on launch day.</p>
-      <ol class="steps">
+      <div class="story">
+      <ol class="steps" id="storySteps">
         <li><span class="n">1</span><h4>Describe your idea</h4><p>Pick AI project or meme coin, then describe it in one sentence.</p>
           <div class="sv sv-in" aria-hidden="true"><span>A furnace that fires raw memes into finished ones</span><i>Build my kit</i></div></li>
         <li><span class="n">2</span><h4>Get roasted, then built</h4><p>{{NAME_BOT}} pokes holes in the pitch, then writes the name, story and posts, and draws two logos.</p>
@@ -417,6 +448,17 @@
         <li><span class="n">3</span><h4>Launch on pons</h4><p>Copy the text, download the logo, and <a href="https://www.ponsfamily.com/launchpad/create" target="_blank" rel="noopener">create your token on pons</a> with everything ready.</p>
           <div class="sv sv-go" aria-hidden="true"><i></i><span>Kiln <em>$KILN</em></span><b>Live on pons</b></div></li>
       </ol>
+        <div class="story-card" id="storyCard" data-step="1" aria-hidden="true">
+          <div class="sc-in"><span id="scIdea">A furnace that fires raw memes into finished ones</span><i>Build my kit</i></div>
+          <div class="sc-roast"><b>{{NAME_BOT}}</b>Fine. Now tell me why anyone holds it past day two.</div>
+          <div class="sc-kit">
+            <div class="sc-id"><img src="/demo/kiln.png" alt="" width="72" height="72" loading="lazy"><div><b>Kiln</b><code>$KILN</code></div></div>
+            <p>Memes go in raw. They come out fired.</p>
+            <div class="sc-parts"><span>Logo</span><span>Story</span><span>X posts</span><span>Mini site</span></div>
+          </div>
+          <div class="sc-live"><i></i>Live on pons</div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -444,6 +486,11 @@
   <section class="light band" id="token" data-page="token">
     <div class="shell token">
       <div>
+        <div class="token-coin"><div class="coin3d lg" id="coinToken" aria-hidden="true"><div class="c3-body">
+  <div class="c3-face c3-front"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#111" stroke-width="54"/><circle cx="362.1" cy="149.9" r="62" fill="#d9d9d9"/><circle cx="362.1" cy="149.9" r="34" fill="#111"/></svg></div>
+  <div class="c3-edge"><i style="--z:-8"></i><i style="--z:-7"></i><i style="--z:-6"></i><i style="--z:-5"></i><i style="--z:-4"></i><i style="--z:-3"></i><i style="--z:-2"></i><i style="--z:-1"></i><i style="--z:0"></i><i style="--z:1"></i><i style="--z:2"></i><i style="--z:3"></i><i style="--z:4"></i><i style="--z:5"></i><i style="--z:6"></i><i style="--z:7"></i><i style="--z:8"></i></div>
+  <div class="c3-face c3-back"><svg viewBox="0 0 512 512"><circle cx="256" cy="256" r="150" fill="none" stroke="#111" stroke-width="54"/><circle cx="362.1" cy="149.9" r="34" fill="#111"/></svg></div>
+</div><div class="c3-shadow"></div></div></div>
         <p class="ticker">$ORYNX</p>
         <p class="muted" style="margin:0;max-width:46ch">The utility token powering Orynx on Robinhood Chain. Holders unlock more of the tool, first.</p>
       </div>
@@ -592,7 +639,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=17"></script>
+<script src="/app.js?v=18"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>

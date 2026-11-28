@@ -1596,6 +1596,17 @@ async def file_css():
     return _static("app.css", "text/css; charset=utf-8")
 
 
+DEMO_FILES = {"kiln.png": "image/png", "kiln-site.jpg": "image/jpeg"}
+
+
+@app.get("/demo/{name}", include_in_schema=False)
+async def file_demo(name: str):
+    if name not in DEMO_FILES:
+        raise HTTPException(404, "Not found.")
+    return RawResponse((FOLDER / "static" / "demo" / name).read_bytes(), media_type=DEMO_FILES[name],
+                       headers={"Cache-Control": "public, max-age=86400"})
+
+
 import features  # noqa: E402
 
 features.install(app, globals())
