@@ -87,7 +87,7 @@ FREE_KIT = int(os.getenv("FREE_KIT", "1"))
 FREE_LOGO = int(os.getenv("FREE_LOGO", "4"))
 HOLDER_KIT = int(os.getenv("HOLDER_KIT", "10"))
 HOLDER_LOGO = int(os.getenv("HOLDER_LOGO", "40"))
-STYLE_FREE = {"classic", "nft"}
+STYLE_FREE = {"classic", "nft", "studio"}
 
 COOKIE = "orynx_wallet"
 AGE_SESSION = 7 * 24 * 3600
@@ -245,7 +245,7 @@ Canvas and format:
 - The first element is the background: <rect width="512" height="512" fill="..."/>.
 - Keep the whole mark inside the safe area from 96 to 416 on both axes, optically centred.
 - Only use <rect>, <circle>, <ellipse>, <path>, <polygon>, <polyline>, <line> and <g>.
-- NO text, letters or numbers. NO <image>, <script>, <style>, <text>, filters, masks, gradients or links.
+- NO text, letters or numbers (unless the style asks for a letter drawn from shapes). NO <image>, <script>, <style>, <text>, filters, masks, gradients or links.
 {RULES_COLOR}
 
 {RULES_DESIGN}
@@ -384,6 +384,12 @@ STYLE_LOGO = {
     "mascot": "Friendly AI character mark built from geometric shapes (not a generic robot head): white on near-black, bold and simple.",
     "pixel": "Retro pixel-art mark made only of square <rect> blocks on a 32 px grid, white on near-black.",
     "minimal": "Ultra-minimal mark with only 2 or 3 shapes. Try black on white this time: white background, near-black mark.",
+    "studio": ("Premium studio mark, like the logo of a top AI or crypto startup: ONE bold, chunky solid shape in warm "
+               "off-white #f3efe6 on the background #0c0b0a, built from 2 or 3 heavy pieces separated by one clean, "
+               "deliberate cut or gap (a stencil-like split, a sheared slit or an offset). Soft, consistent corner "
+               "radii or perfectly sharp angles, never a mix. Optionally ONE small accent shape (a dot, chip, chevron "
+               "or tick, max 12% of the mark) in the accent colour given below. Solid fills only, no strokes thinner "
+               "than 40 px, no outlines. This style wins over the stroke and grey rules above."),
 }
 
 # ---------------------------------------------------------------------------
@@ -1112,6 +1118,17 @@ def pixel_svg(art: dict, background: str, circle: bool) -> str:
             f'{back}{vignette}{drop}{art_rects}</svg>')
 
 
+def recolor_studio(svg: str, background: str) -> str:
+    """New backdrop colour for a studio mark: rebuild the glow gradient around it."""
+    acc = re.search(r'data-accent="(#[0-9a-fA-F]{6})"', svg)
+    accent = acc.group(1) if acc else STUDIO_ACCENTS[0]
+    light = _brightness(background[1:]) > 150
+    svg = re.sub(r'#f3efe6' if light else r'#141210', "#141210" if light else "#f3efe6", svg, flags=re.I)
+    stops = (f'<stop offset="0" stop-color="{_mix(background, accent, .35 if light else .55)}"/>'
+             f'<stop offset=".45" stop-color="{_mix(background, accent, .12)}"/><stop offset="1" stop-color="{_mix(background, "#000000", .35)}"/>')
+    return re.sub(r'(<radialGradient id="stB"[^>]*>).*?(</radialGradient>)', lambda m: m.group(1) + stops + m.group(2), svg, count=1, flags=re.S)
+
+
 def recolor_pixel(svg: str, background: str) -> str:
     """Swap the backdrop of a pixel logo: new background, and a glow that suits it."""
     old = dict(re.findall(r'data-(bg|glow|spark)="(#[0-9a-fA-F]{6})"', svg))
@@ -1161,6 +1178,67 @@ async def make_pixel_logo(data, background: str) -> str:
     return pixel_svg(read_pixel(answer), background, data.circle)
 
 
+STUDIO_ACCENTS = ["#f5a524", "#ff6b2c", "#e9b72a", "#ff8a3d", "#f7c948", "#4d7cff", "#3ddc97"]
+STUDIO_BG = "#0c0b0a"
+
+
+def studio_finish(svg: str, accent: str, circle: bool, background: str = "") -> str:
+    """Dress an AI-project mark the studio way: dark backdrop with a warm glow, fine grid, orbit or ring, grain."""
+    import math
+    body = re.search(r"<svg\b[^>]*>(.*)</svg>", svg, re.S).group(1)
+    first = re.match(r'\s*<rect\b[^>]*width="512"[^>]*/>', body)
+    bgc = STUDIO_BG
+    if first:
+        m = re.search(r'fill="(#[0-9a-fA-F]{6})"', first.group(0))
+        bgc = m.group(1).lower() if m else bgc
+        body = body[first.end():]
+    base = background or STUDIO_BG
+    for f in {bgc, bgc.upper()}:
+        body = body.replace(f'fill="{f}"', 'fill="url(#stB)"').replace(f'stroke="{f}"', 'stroke="url(#stB)"')
+    light = _brightness(base[1:]) > 150
+    if light:
+        body = re.sub(r'#f3efe6', "#141210", body, flags=re.I)
+    edge = _mix(base, "#000000", .35)
+    glow = _mix(base, accent, .55 if not light else .35)
+    gx, gy = secrets.choice([(300, 200), (230, 210), (256, 230), (320, 260)])
+    defs = (f'<radialGradient id="stB" gradientUnits="userSpaceOnUse" cx="{gx}" cy="{gy}" r="420">'
+            f'<stop offset="0" stop-color="{glow}"/><stop offset=".45" stop-color="{_mix(base, accent, .12)}"/>'
+            f'<stop offset="1" stop-color="{edge}"/></radialGradient>'
+            '<filter id="stN" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" '
+            'numOctaves="2" seed="11"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .05 0"/></filter>'
+            '<filter id="stS" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="14"/>'
+            '<feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer>'
+            '<feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>')
+    solid = re.sub(r'<(?:circle|ellipse|rect|path|polygon|polyline|line)\b[^>]*"url\(#stB\)"[^>]*/>', "", body)
+    line = "#ffffff" if not light else "#000000"
+    deco = ""
+    look = secrets.choice(["dots", "grid"])
+    if look == "dots":
+        deco += f'<g fill="{line}" opacity=".07">' + "".join(
+            f'<rect x="{x - 1}" y="{y - 1}" width="2" height="2"/>' for x in range(32, 512, 32) for y in range(32, 512, 32)) + "</g>"
+    if circle:
+        kind = secrets.choice(["orbit", "ring"])
+        if kind == "orbit":
+            tilt = secrets.choice([-18, -12, 14, 20])
+            deco += (f'<defs><linearGradient id="stO" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{accent}" stop-opacity="0"/>'
+                     f'<stop offset=".35" stop-color="{accent}" stop-opacity=".9"/><stop offset=".7" stop-color="{accent}" stop-opacity="0"/></linearGradient></defs>'
+                     f'<g fill="none" transform="rotate({tilt} 256 256)">'
+                     f'<ellipse cx="256" cy="256" rx="236" ry="118" stroke="{line}" stroke-opacity=".10" stroke-width="1.5"/>'
+                     f'<ellipse cx="256" cy="256" rx="200" ry="150" stroke="{line}" stroke-opacity=".08" stroke-width="1.5"/>'
+                     f'<ellipse cx="256" cy="256" rx="236" ry="118" stroke="url(#stO)" stroke-width="2.5"/></g>')
+        else:
+            grid = "".join(f'<path d="M{x} 70V442" />' for x in range(96, 440, 32)) + "".join(f'<path d="M70 {y}H442" />' for y in range(96, 440, 32))
+            deco += (f'<defs><clipPath id="stC"><circle cx="256" cy="256" r="186"/></clipPath></defs>'
+                     f'<g clip-path="url(#stC)" stroke="{accent}" stroke-opacity=".10" stroke-width="1">{grid}</g>'
+                     f'<circle cx="256" cy="256" r="186" fill="none" stroke="{accent}" stroke-opacity=".38" stroke-width="1.5"/>')
+    elif look == "grid":
+        grid = "".join(f'<path d="M{x} 0V512" />' for x in range(32, 512, 32)) + "".join(f'<path d="M0 {y}H512" />' for y in range(32, 512, 32))
+        deco += f'<g stroke="{line}" stroke-opacity=".04" stroke-width="1">{grid}</g>'
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-studio="1" '
+            f'data-accent="{accent}"><defs>{defs}</defs><rect width="512" height="512" fill="url(#stB)"/>{deco}'
+            f'<g filter="url(#stS)">{solid}</g>{body}<rect width="512" height="512" filter="url(#stN)"/></svg>')
+
+
 @app.post("/api/logo")
 async def make_logo(data: LogoRequest, request: Request):
     if not client_ai:
@@ -1191,6 +1269,16 @@ async def make_logo(data: LogoRequest, request: Request):
                       " No circle, disc or ring behind the subject: it sits straight on the plain background colour.")
     if mode == "meme":
         direction += f" Colour mood: {secrets.choice(PALETTE_MEME)}."
+    accent = secrets.choice(STUDIO_ACCENTS)
+    if mode == "ai" and style == "studio":
+        tick = re.sub(r"[^A-Za-z]", "", data.ticker or "").upper()
+        letter = tick[:1]
+        direction = (f"Build a bold lettermark of the letter {letter or 'that starts the project name'} out of 2 or 3 solid "
+                     "geometric pieces (paths), with one clean cut or offset that gives it a hidden second meaning."
+                     if data.variant % 2 == 1 else
+                     "Build an abstract symbol (no letter) from 2 or 3 heavy solid pieces: split, offset or mirrored halves "
+                     "of a circle, a slanted rounded square, a chevron or a stencil form, with one clean gap between them.")
+        direction += f" Accent colour: {accent}."
     message = (
         f"Logo concept: {data.brief}\n"
         f"Style: {list_style[style]}\n"
@@ -1201,7 +1289,7 @@ async def make_logo(data: LogoRequest, request: Request):
         message += ("\n\nReference for the finish only. Match this level of polish and technique, never its subject or colours"
                     + ("" if data.circle else ", and leave out its background circle") + ":\n" + EXAMPLE_EMBLEM)
     background = data.background.lower() if HEX_COLOR.match(data.background or "") else ""
-    if background:
+    if background and not (mode == "ai" and style == "studio"):
         message += (f"\nBackground colour: use exactly {background} for the background <rect> and for any "
                     "background-coloured cut-outs. Choose mark colours with strong contrast against it.")
     png = None
@@ -1226,11 +1314,15 @@ async def make_logo(data: LogoRequest, request: Request):
                 log.warning("Logo answer without SVG (%d chars): %r", len(answer), answer[:300])
             svg = get_svg(answer)
             await asyncio.to_thread(svg_to_png, svg, 64)
-            if time.time() - t_start < 50:
+            if time.time() - t_start < 50 and not (mode == "ai" and style == "studio"):
                 try:
                     svg = await fix_logo(svg, mode)
                 except Exception as err:
                     log.warning("Logo review skipped: %s", err)
+            if mode == "ai" and style == "studio":
+                base = studio_finish(svg, accent, data.circle, background)
+                png = await asyncio.to_thread(svg_to_png, base, 2048 if (GATING_ACTIVE and holder) else 1024)
+                break
             if background:
                 svg = recolor_svg(svg, background, mode)
             base = svg
@@ -1285,12 +1377,14 @@ async def recolor_logo(data: RecolorRequest, request: Request):
         raise HTTPException(400, "That logo can't be recoloured.")
     mode = "meme" if data.mode == "meme" else "ai"
     _, holder = await who_and_holder(request)
-    if 'data-px="1"' in svg[:300]:
+    if 'data-studio="1"' in svg[:300]:
+        svg = recolor_studio(svg, data.background.lower())
+    elif 'data-px="1"' in svg[:300]:
         svg = recolor_pixel(svg, data.background.lower())
     else:
         svg = recolor_svg(svg, data.background.lower(), mode)
     try:
-        polished = svg if 'data-px="1"' in svg[:300] else polish_logo(svg, mode, data.style)
+        polished = svg if ('data-px="1"' in svg[:300] or 'data-studio="1"' in svg[:300]) else polish_logo(svg, mode, data.style)
         png = await asyncio.to_thread(svg_to_png, polished, 2048 if (GATING_ACTIVE and holder) else 1024)
     except Exception:
         raise HTTPException(400, "That logo can't be recoloured.")

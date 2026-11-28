@@ -244,13 +244,14 @@ function showKit(kit) {
 
 function setButtonStyle(active) {
   document.querySelectorAll(".style").forEach((b) => {
-    const key = gating && !holder && b.dataset.style !== "classic" && b.dataset.style !== "nft" && !(modeKit === "meme" && b.dataset.style === "pixel");
+    const key = gating && !holder && !["classic", "nft", "studio"].includes(b.dataset.style) && !(modeKit === "meme" && b.dataset.style === "pixel");
     if (b.dataset.style === "nft") b.hidden = modeKit !== "meme";
+    if (b.dataset.style === "studio") b.hidden = modeKit !== "ai";
     b.classList.toggle("locked", key);
     b.disabled = !active || key;
     b.title = key ? "For $ORYNX holders" : "";
   });
-  $("circOpt").hidden = modeKit !== "meme";
+  $("circOpt").hidden = false;
 }
 
 async function makeLogo(style) {
