@@ -1845,7 +1845,7 @@ h1{{font:400 clamp(28px,5vw,46px)/1.15 Michroma;margin:14px 0 4px;overflow-wrap:
 async def page_kit(id_item: str):
     it = await get_item(id_item)
     if not it:
-        return HTMLResponse('<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/#examples"><a href="/">Orynx</a>', status_code=404)
+        return HTMLResponse('<!DOCTYPE html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/#community"><a href="/">Orynx</a>', status_code=404)
     name = str(it.get("name", ""))
     ticker = ("$" + it["ticker"]) if it.get("ticker") else ""
     url = f"{SITE}/k/{id_item}"

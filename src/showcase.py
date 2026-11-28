@@ -90,7 +90,7 @@ SHOWCASE = """
           <li><span class="n">03</span><div><b>Your story and socials</b><span>Logo, tagline, description, features or lore, X, Telegram and website.</span></div></li>
           <li><span class="n">04</span><div><b>Free, and live in the gallery</b><span>Launched kits get a Live on pons badge in the community gallery.</span></div></li>
         </ul>
-        <div class="lps-acts"><a class="pill solid" href="#build">Build a kit</a><a class="pill line" href="#examples">See community kits</a></div>
+        <div class="lps-acts"><a class="pill solid" href="#build">Build a kit</a><a class="pill line" href="#community">See community kits</a></div>
       </div>
       <div class="lps-demo">
         <input type="radio" name="lpsTab" id="lpsT1" checked><input type="radio" name="lpsTab" id="lpsT2">

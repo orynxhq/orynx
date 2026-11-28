@@ -1275,7 +1275,7 @@ $("chatToKit").onclick = () => {
   toBuild();
 };
 
-const PAGE = { examples: "examples", token: "token", burn: "token", faq: "faq", consult: "consult", scan: "scan" };
+const PAGE = { examples: "examples", community: "examples", ideas: "examples", token: "token", burn: "token", faq: "faq", consult: "consult", scan: "scan" };
 const smooth = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 let pageActive = null;
 function openPage() {
@@ -1293,6 +1293,7 @@ function openPage() {
   });
   pageActive = page;
   $("burn").hidden = !(page === "token" && $("burn").dataset.present);
+  if (h === "ideas") { setTimeout(() => $("ideaWall") && $("ideaWall").scrollIntoView({ behavior: "auto", block: "start" }), 60); return; }
   if (h === "burn") { const go = () => $("burn").hidden ? setTimeout(go, 200) : $("burn").scrollIntoView({ behavior: "auto", block: "start" }); setTimeout(go, 50); return; }
   const el = page === "home" && h && h !== "home" ? $(h) : null;
   if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: swap ? "auto" : smooth(), block: h === "build" ? "center" : "start" }));
