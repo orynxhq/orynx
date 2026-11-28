@@ -755,3 +755,14 @@
 .up-logo:hover{border-color:#999}
 .up-msg{margin:10px 0 0;font-size:13px;color:#4ade80}
 .up-msg.err{color:#f87171}
+
+/* video studio */
+.st-kinds{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.st-kind{border:1px solid var(--rule-d);background:#0b0b0b;color:var(--graphite);border-radius:999px;padding:8px 14px;font:500 14px var(--body);cursor:pointer}
+.st-kind.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.st-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.st-f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--graphite)}
+.st-f input{min-height:42px;border-radius:12px;border:1px solid var(--rule-d);background:#0b0b0b;color:#fff;padding:0 12px;font:14px var(--body)}
+.st-f input:focus{outline:none;border-color:#777}
+#stBox canvas,#stBox video{width:100%;display:block;border-radius:14px}
+@media (max-width:560px){.st-fields{grid-template-columns:1fr}}

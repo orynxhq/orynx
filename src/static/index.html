@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Michroma&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20">
+<link rel="stylesheet" href="/app.css?v=21">
 </head>
 <body>
 
@@ -177,6 +177,18 @@
             <h3>X header <span>(1500 &times; 500, for your profile)</span></h3>
             <div class="banner"><img id="bannerImg" alt="X header preview"></div>
             <div class="banner-act"><a class="pill line" id="bannerDl" href="#" download="x_header.png">Download header</a><span>Also inside the .zip</span></div>
+          </div>
+          <div class="group" id="studioGroup" hidden>
+            <h3>Post videos <span>(20 sec with lo-fi music, made by Si Dev)</span></h3>
+            <div class="st-kinds" role="group" aria-label="Video type">
+              <button class="st-kind on" data-kind="milestone" type="button">Holder milestone</button>
+              <button class="st-kind" data-kind="burn" type="button">Burn</button>
+              <button class="st-kind" data-kind="update" type="button">Feature update</button>
+              <button class="st-kind" data-kind="launch" type="button">Launch</button>
+            </div>
+            <div class="st-fields" id="stFields"></div>
+            <div class="vid" id="stBox"><div class="vid-empty">Pick a video type, fill in your numbers and Si Dev animates it with your logo and original music.</div></div>
+            <div class="banner-act"><button class="pill solid" id="stMake" type="button">Make video</button><a class="pill line" id="stDl" href="#" download hidden>Download video</a><span id="stMsg"></span></div>
           </div>
           <div class="group" id="videoGroup" hidden>
             <h3>Intro video <span id="vidInfo">(15 sec with original music)</span></h3>
@@ -580,7 +592,7 @@
 </nav>
 
 <script src="/upgrade.js?v=1"></script>
-<script src="/app.js?v=16"></script>
+<script src="/app.js?v=17"></script>
 <script src="/features.js?v=2" defer></script>
 </body>
 </html>
